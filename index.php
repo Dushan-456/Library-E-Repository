@@ -89,7 +89,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
     <!-- Top Global Header -->
     <header class="main-header">
         <div class="header-left">
-            <img src="img/logo.png" alt="PGIM Logo">
+            <img src="./assets/img/logo.png" alt="PGIM Logo">
             <h1>PGIM Digital Library</h1>
         </div>
         <div class="header-right">
