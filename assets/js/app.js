@@ -3,13 +3,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const currentFolderName = document.getElementById("currentFolderName");
   const breadcrumb = document.getElementById("breadcrumb");
   const searchInput = document.getElementById("searchInput");
+  const backBtn = document.getElementById("backBtn");
 
   let currentPath = "";
   let currentViewMode = "grid"; // default
+  let pathHistory = [];
+
+  // Handle Back Button
+  if (backBtn) {
+      backBtn.onclick = () => {
+          if (pathHistory.length > 1) {
+              pathHistory.pop(); // Remove current path
+              const previousPath = pathHistory.pop(); // Get previous path
+              loadFolder(previousPath);
+          }
+      };
+  }
 
   // Load folder contents
   async function loadFolder(path = "") {
     currentPath = path;
+    
+    // Add to history if it's a new path
+    if (pathHistory.length === 0 || pathHistory[pathHistory.length - 1] !== path) {
+        pathHistory.push(path);
+    }
+    
+    // Toggle back button visibility
+    if (backBtn) {
+        backBtn.style.display = pathHistory.length > 1 ? 'flex' : 'none';
+    }
+
     fileGrid.innerHTML =
       '<div class="loader"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
 
@@ -34,11 +58,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderFiles(items) {
     fileGrid.innerHTML = "";
 
-    if (items.length === 0) {
+    // If path is empty (Home), prepend the Welcome Screen content
+    if (currentPath === "") {
+        const welcomeWrapper = document.createElement("div");
+        welcomeWrapper.innerHTML = getWelcomeHTML();
+        welcomeWrapper.className = "welcome-wrapper";
+        // Ensure controls are visible for the items below
+        document.querySelector('.view-controls').style.display = 'block';
+        fileGrid.appendChild(welcomeWrapper);
+    }
+
+    if (items.length === 0 && currentPath !== "") {
       fileGrid.innerHTML = '<div class="loader">No items found</div>';
       return;
     }
 
+    // Render the actual files/folders below the welcome hero
+    const itemsContainer = document.createElement("div");
+    itemsContainer.className = `items-container view-${currentViewMode}`;
+    
     items.forEach((item) => {
       const div = document.createElement("div");
       div.className = "file-item";
@@ -56,9 +94,63 @@ document.addEventListener("DOMContentLoaded", () => {
           openViewer(item.path, item.name);
         }
       };
-      fileGrid.appendChild(div);
+      itemsContainer.appendChild(div);
     });
+    
+    fileGrid.appendChild(itemsContainer);
   }
+
+  function getWelcomeHTML() {
+      return `
+        <div class="welcome-container" style="margin-bottom: 2rem;">
+            <div class="welcome-hero">
+                <h2>Welcome to PGIM Digital Library</h2>
+                <p>Your centralized hub for academic resources, research papers, and clinical journals.</p>
+            </div>
+            
+            <div class="welcome-slider-container">
+                <div class="welcome-slider">
+                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'ClinicalKey/Books\\']').click()">
+                        <i class="fas fa-book-medical"></i>
+                        <h3>ClinicalKey Books</h3>
+                        <p>Access thousands of medical texts</p>
+                    </div>
+                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'ClinicalKey/Journals\\']').click()">
+                        <i class="fas fa-microscope"></i>
+                        <h3>Clinical Journals</h3>
+                        <p>Stay updated with latest research</p>
+                    </div>
+                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'Thesis & Dissertation\\']').click()">
+                        <i class="fas fa-user-graduate"></i>
+                        <h3>Theses & Dissertations</h3>
+                        <p>Explore postgraduate work</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="welcome-info-grid">
+                <div class="info-card instructions">
+                    <h3><i class="fas fa-info-circle"></i> Instructions</h3>
+                    <ul>
+                        <li>Use the sidebar to navigate through main collections.</li>
+                        <li>Search bar allows keyword searching across all documents.</li>
+                        <li>Click on any PDF to securely view it in the locked browser.</li>
+                        <li>Downloading and printing are strictly prohibited.</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card privacy">
+                    <h3><i class="fas fa-shield-alt"></i> Privacy & Security Notice</h3>
+                    <p>This system is monitored. Your IP address and session activity are recorded. Unauthorized distribution of materials found here is a violation of PGIM policy and may result in disciplinary action. <strong>Please log out when you are finished.</strong></p>
+                </div>
+            </div>
+        </div>
+      `;
+  }
+
+  // Remove the old renderWelcomeScreen function that overrode styles completely
+
+
 
   function updateBreadcrumb(path) {
     const parts = path.split("/").filter((p) => p);
@@ -91,6 +183,10 @@ document.addEventListener("DOMContentLoaded", () => {
         .querySelectorAll(".sidebar-nav li")
         .forEach((l) => l.classList.remove("active"));
       li.classList.add("active");
+      
+      // Clear history when explicitly using the main sidebar
+      pathHistory = [];
+      
       loadFolder(li.dataset.folder);
     };
   });
@@ -121,7 +217,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setViewMode(mode) {
     currentViewMode = mode;
-    fileGrid.setAttribute("data-view", mode);
+    fileGrid.setAttribute("data-view", mode); // Keeps old compatibility if someone uses it
+    
+    // Specifically target the new items-container if it exists
+    const itemsContainer = fileGrid.querySelector('.items-container');
+    if (itemsContainer) {
+        itemsContainer.className = `items-container view-${mode}`;
+    }
+
+    document.querySelector('.view-controls').style.display = 'block'; // Ensure controls are shown for grid/list
+    
     if (mode === "list") {
       listViewBtn.classList.add("active");
       gridViewBtn.classList.remove("active");
