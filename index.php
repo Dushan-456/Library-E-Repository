@@ -20,30 +20,61 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
 $_SESSION['last_activity'] = time(); // Update last activity time
 
 
-$baseDir = 'E Resources';
+require_once __DIR__ . '/path_config.php';
 
-function getDirectoryContents($path) {
-    $fullPath = realpath($path);
-    $basePath = realpath('E Resources');
+function getDirectoryContents($virtualPath) {
+    global $LIBRARY_MAPPINGS;
+    $virtualPath = str_replace(['/', '\\'], '/', trim($virtualPath, '/'));
+    $items = [];
     
-    // Security check: ensure the path is within E Resources
-    if (strpos($fullPath, $basePath) !== 0) {
+    if ($virtualPath === '') {
+        // Root directory: return mapped virtual roots + physical folders in default E Resources
+        foreach ($LIBRARY_MAPPINGS as $key => $targetPath) {
+            if ($key === 'DEFAULT') continue;
+            
+            if (is_dir($targetPath)) {
+                $items[] = [
+                    'name' => $key,
+                    'path' => $key,
+                    'isDir' => true,
+                    'size' => 0
+                ];
+            }
+        }
+        
+        $defaultDir = $LIBRARY_MAPPINGS['DEFAULT'];
+        if (is_dir($defaultDir)) {
+            $files = scandir($defaultDir);
+            foreach ($files as $file) {
+                if ($file === '.' || $file === '..' || isset($LIBRARY_MAPPINGS[$file])) continue; 
+                
+                $filePath = $defaultDir . DIRECTORY_SEPARATOR . $file;
+                $items[] = [
+                    'name' => $file,
+                    'path' => $file,
+                    'isDir' => is_dir($filePath),
+                    'size' => is_file($filePath) ? filesize($filePath) : 0
+                ];
+            }
+        }
+        return $items;
+    }
+
+    $physicalPath = getPhysicalPath($virtualPath);
+    if (!isPathSecure($physicalPath, $virtualPath)) {
         return ['error' => 'Access denied'];
     }
 
-    $items = [];
-    if (is_dir($fullPath)) {
+    $fullPath = realpath($physicalPath);
+    if ($fullPath && is_dir($fullPath)) {
         $files = scandir($fullPath);
         foreach ($files as $file) {
             if ($file === '.' || $file === '..') continue;
             
             $filePath = $fullPath . DIRECTORY_SEPARATOR . $file;
-            $relPath = str_replace($basePath . DIRECTORY_SEPARATOR, '', $filePath);
-            $relPath = str_replace(DIRECTORY_SEPARATOR, '/', $relPath);
-            
             $items[] = [
                 'name' => $file,
-                'path' => $relPath,
+                'path' => $virtualPath . '/' . $file,
                 'isDir' => is_dir($filePath),
                 'size' => is_file($filePath) ? filesize($filePath) : 0
             ];
@@ -56,7 +87,7 @@ function getDirectoryContents($path) {
 if (isset($_GET['action']) && $_GET['action'] === 'get_folder') {
     header('Content-Type: application/json');
     $folder = isset($_GET['folder']) ? $_GET['folder'] : '';
-    echo json_encode(getDirectoryContents($baseDir . DIRECTORY_SEPARATOR . $folder));
+    echo json_encode(getDirectoryContents($folder));
     exit;
 }
 
@@ -65,23 +96,34 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
     header('Content-Type: application/json');
     $query = strtolower($_GET['query']);
     $results = [];
-    $basePath = realpath($baseDir);
     
-    $it = new RecursiveDirectoryIterator($baseDir, RecursiveDirectoryIterator::SKIP_DOTS);
-    foreach (new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST) as $file) {
-        $filename = $file->getFilename();
-        if (strpos(strtolower($filename), $query) !== false) {
-            $fullPath = $file->getRealPath();
-            $relPath = str_replace($basePath . DIRECTORY_SEPARATOR, '', $fullPath);
-            $relPath = str_replace(DIRECTORY_SEPARATOR, '/', $relPath);
-            
-            $results[] = [
-                'name' => $filename,
-                'path' => $relPath,
-                'isDir' => $file->isDir(),
-                'size' => $file->isFile() ? $file->getSize() : 0
-            ];
-            if (count($results) > 100) break; // Increased limit
+    global $LIBRARY_MAPPINGS;
+    foreach ($LIBRARY_MAPPINGS as $rootName => $physicalBase) {
+        $realBase = realpath($physicalBase);
+        if (!$realBase || !is_dir($realBase)) continue;
+        
+        try {
+            $it = new RecursiveDirectoryIterator($realBase, RecursiveDirectoryIterator::SKIP_DOTS);
+            foreach (new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST) as $file) {
+                $filename = $file->getFilename();
+                if (strpos(strtolower($filename), $query) !== false) {
+                    $fullPath = $file->getRealPath();
+                    $relPath = str_replace($realBase . DIRECTORY_SEPARATOR, '', $fullPath);
+                    $relPath = str_replace(DIRECTORY_SEPARATOR, '/', $relPath);
+                    
+                    $virtualPath = ($rootName === 'DEFAULT') ? $relPath : $rootName . '/' . $relPath;
+                    
+                    $results[] = [
+                        'name' => $filename,
+                        'path' => $virtualPath,
+                        'isDir' => $file->isDir(),
+                        'size' => $file->isFile() ? $file->getSize() : 0
+                    ];
+                    if (count($results) > 100) break 2; // Increased limit
+                }
+            }
+        } catch (Exception $e) {
+            // Ignore unreadable directories
         }
     }
     echo json_encode($results);
@@ -153,8 +195,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
-              
-                <div class="breadcrumb" id="breadcrumb">
+                <button id="backBtn" class="back-btn" style="display: none;" title="Go Back">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="breadcrumb" id="breadcrumb" style="margin-left: 1rem;">
                     <span>Library</span>
                 </div>
             </header>
