@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/seb_check.php';
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: login.php");
     exit;
