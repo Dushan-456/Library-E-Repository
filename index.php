@@ -8,6 +8,18 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
+// 15-Minute Session Timeout (900 seconds)
+$timeout_duration = 900;
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+    // Session expired
+    session_unset();
+    session_destroy();
+    header("Location: login.php?msg=timeout");
+    exit;
+}
+$_SESSION['last_activity'] = time(); // Update last activity time
+
+
 $baseDir = 'E Resources';
 
 function getDirectoryContents($path) {
