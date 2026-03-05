@@ -23,7 +23,8 @@ if ($fullPath === false || strpos($fullPath, $basePath) !== 0 || !is_file($fullP
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viewer - <?php echo htmlspecialchars(basename($file)); ?></title>
+    <title>Secure PDF Viewer - <?php echo htmlspecialchars(basename($file)); ?></title>
+    <link rel="icon" type="image/x-icon" href="./assets/img/logo without bg.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
