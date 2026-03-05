@@ -88,24 +88,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-bottom: 1rem;
         }
         .login-body{
-            background-image: url('./assets/img/bg.jpg') , linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+            background-image: url('./assets/img/bg.jpeg') , linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
             background-size: cover;
             background-position: center;
             background-blend-mode: overlay;
             display: flex;
+            flex-direction: column;
+            gap: 20px;
             align-items: center;
             justify-content: center;
             height: 100vh;
+        }
+        .logo{
+            width: 100px;
+            height: 100px;
         }
     </style>
 </head>
 <body >
     <div class="login-body">
 
+        <img class="logo" src="./assets/img/logo.png" alt="PGIM Logo">
         <div class="login-card">
             <div class="login-header">
                 <h2>PGIM Digital Library</h2>
-                <p style="color: #64748b; font-size: 0.875rem;">Please sign in to access the library Resources</p>
+                <p style="color: #64748b; font-size: 0.875rem;">Please login to access the library Resources</p>
             </div>
             <?php if ($error): ?>
                 <div class="error-msg"><?php echo $error; ?></div>
@@ -119,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label>Password</label>
                     <input type="password" name="password" required placeholder="Password">
                 </div>
-                <button type="submit" class="login-btn">Sign In</button>
+                <button type="submit" class="login-btn">Login</button>
             </form>
         </div>
     </div>
