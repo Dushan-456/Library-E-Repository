@@ -17,16 +17,22 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
 }
 $_SESSION['last_activity'] = time(); // Update last activity time
 
+require_once __DIR__ . '/path_config.php';
+
 if (!isset($_GET['file'])) {
     die("No file specified");
 }
 
 $file = $_GET['file'];
-$basePath = realpath('E Resources');
-$fullPath = realpath($basePath . DIRECTORY_SEPARATOR . $file);
+$physicalPath = getPhysicalPath($file);
 
 // Security Check
-if ($fullPath === false || strpos($fullPath, $basePath) !== 0 || !is_file($fullPath)) {
+if (!isPathSecure($physicalPath, $file)) {
+    die("Invalid file path");
+}
+
+$fullPath = realpath($physicalPath);
+if ($fullPath === false || !is_file($fullPath)) {
     die("Invalid file path");
 }
 ?>
