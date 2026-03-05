@@ -28,20 +28,7 @@ function getDirectoryContents($virtualPath) {
     $items = [];
     
     if ($virtualPath === '') {
-        // Root directory: return mapped virtual roots + physical folders in default E Resources
-        foreach ($LIBRARY_MAPPINGS as $key => $targetPath) {
-            if ($key === 'DEFAULT') continue;
-            
-            if (is_dir($targetPath)) {
-                $items[] = [
-                    'name' => $key,
-                    'path' => $key,
-                    'isDir' => true,
-                    'size' => 0
-                ];
-            }
-        }
-        
+        // Root directory: only return physical folders in default E Resources, do NOT show virtual roots
         $defaultDir = $LIBRARY_MAPPINGS['DEFAULT'];
         if (is_dir($defaultDir)) {
             $files = scandir($defaultDir);
@@ -138,8 +125,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
     <title>PGIM Digital Library</title>
     <link rel="icon" type="image/x-icon" href="./assets/img/logo without bg.png">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Local FontAwesome for Offline Support -->
+    <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
+    
+    <!-- pdf.js for rendering PDFs natively (Local for offline) -->
+    <script src="./assets/pdfjs/pdf.min.js"></script>
 </head>
 <body>
     <!-- Top Global Header -->

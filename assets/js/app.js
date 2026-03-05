@@ -55,11 +55,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function renderFiles(items) {
+  function renderFiles(items, isSearch = false) {
     fileGrid.innerHTML = "";
 
-    // If path is empty (Home), prepend the Welcome Screen content
-    if (currentPath === "") {
+    // If path is empty (Home) AND we are NOT searching, prepend the Welcome Screen content
+    if (currentPath === "" && !isSearch) {
         const welcomeWrapper = document.createElement("div");
         welcomeWrapper.innerHTML = getWelcomeHTML();
         welcomeWrapper.className = "welcome-wrapper";
@@ -68,8 +68,18 @@ document.addEventListener("DOMContentLoaded", () => {
         fileGrid.appendChild(welcomeWrapper);
     }
 
-    if (items.length === 0 && currentPath !== "") {
-      fileGrid.innerHTML = '<div class="loader">No items found</div>';
+    if (items.length === 0 && (currentPath !== "" || isSearch)) {
+      const isEmptyDir = !isSearch;
+      const noResults = document.createElement("div");
+      noResults.style.gridColumn = "1 / -1";
+      noResults.style.textAlign = "center";
+      noResults.style.padding = "4rem 2rem";
+      noResults.innerHTML = `
+            <i class="fas ${isEmptyDir ? 'fa-folder-open' : 'fa-search'}" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+            <h3 style="color: var(--text-main); font-size: 1.25rem;">${isEmptyDir ? 'This folder is empty' : 'No results found'}</h3>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;">${isEmptyDir ? 'There are no files or subfolders here yet.' : 'Try adjusting your search keywords or browsing the collections.'}</p>
+      `;
+      fileGrid.appendChild(noResults);
       return;
     }
 
@@ -101,13 +111,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getWelcomeHTML() {
+      // Current timestamp to break cache for images
+      const t = new Date().getTime();
       return `
         <div class="welcome-container" style="margin-bottom: 2rem;">
             <div class="welcome-hero">
                 <h2>Welcome to PGIM Digital Library</h2>
                 <p>Your centralized hub for academic resources, research papers, and clinical journals.</p>
             </div>
-            
             <div class="welcome-slider-container">
                 <div class="welcome-slider">
                     <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'ClinicalKey/Books\\']').click()">
@@ -127,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                 </div>
             </div>
-
             <div class="welcome-info-grid">
                 <div class="info-card instructions">
                     <h3><i class="fas fa-info-circle"></i> Instructions</h3>
@@ -144,6 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p>This system is monitored. Your IP address and session activity are recorded. Unauthorized distribution of materials found here is a violation of PGIM policy and may result in disciplinary action. <strong>Please log out when you are finished.</strong></p>
                 </div>
             </div>
+            
         </div>
       `;
   }
@@ -202,12 +213,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      fileGrid.innerHTML = '<div class="loader">Searching...</div>';
+      fileGrid.innerHTML = '<div class="loader"><i class="fas fa-circle-notch fa-spin"></i>Searching the library...</div>';
       const response = await fetch(
         `index.php?action=search&query=${encodeURIComponent(query)}`,
       );
       const data = await response.json();
-      renderFiles(data);
+      renderFiles(data, true); // Pass true to indicate this is a search result
     }, 500);
   };
 

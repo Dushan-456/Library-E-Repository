@@ -452,8 +452,25 @@ justify-content: space-between;
 .loader {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 3rem;
-  color: var(--text-muted);
+  padding: 4rem;
+  color: var(--primary);
+  font-size: 1.25rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loader i {
+  font-size: 2.5rem;
+  animation: spinPulse 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes spinPulse {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.8; }
+  50% { transform: rotate(180deg) scale(1.2); opacity: 1; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
 }
 .sidebar-footer {
   padding: 1rem 1.5rem;
@@ -478,8 +495,8 @@ justify-content: space-between;
 
 .welcome-hero {
   text-align: center;
-  padding: 3rem 1rem;
-  background: linear-gradient(135deg, var(--primary) 0%, #0ea5e9 100%);
+  padding: 1rem 1rem;
+  background: linear-gradient(135deg, var(--primary) 0%, #0ee93d 100%);
   border-radius: 16px;
   color: white;
   box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
