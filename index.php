@@ -92,6 +92,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
             <img src="./assets/img/logo.png" alt="PGIM Logo">
             <h1>PGIM Digital Library</h1>
         </div>
+          <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search resources...">
+                </div>
         <div class="header-right">
             <div class="user-profile">
                 <i class="fas fa-user-circle"></i>
@@ -131,10 +135,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
-                <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search resources...">
-                </div>
+              
                 <div class="breadcrumb" id="breadcrumb">
                     <span>Library</span>
                 </div>
