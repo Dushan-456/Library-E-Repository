@@ -129,6 +129,12 @@ body {
   color: var(--primary);
 }
 
+.sidebar-nav  {
+display: flex;
+height: 100%;
+flex-direction: column;
+justify-content: space-between;
+}
 .sidebar-nav ul {
   list-style: none;
 }
@@ -424,5 +430,12 @@ body {
   grid-column: 1 / -1;
   text-align: center;
   padding: 3rem;
+  color: var(--text-muted);
+}
+.sidebar-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
