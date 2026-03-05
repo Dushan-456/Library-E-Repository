@@ -7,6 +7,12 @@ $valid_username = "admin";
 $valid_password = "password123";
 
 $error = "";
+$message = "";
+
+// Check for timeout message
+if (isset($_GET['msg']) && $_GET['msg'] === 'timeout') {
+    $message = "Your session has expired due to 15 minutes of inactivity. Please login again.";
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'] ?? '';
@@ -15,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($username === $valid_username && $password === $valid_password) {
         $_SESSION['loggedin'] = true;
         $_SESSION['username'] = $username;
+        $_SESSION['last_activity'] = time(); // Initialize activity time
         header("Location: index.php");
         exit;
     } else {
@@ -118,6 +125,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <?php if ($error): ?>
                 <div class="error-msg"><?php echo $error; ?></div>
+            <?php endif; ?>
+            <?php if ($message): ?>
+                <div class="error-msg" style="color: #eab308;"><?php echo $message; ?></div>
             <?php endif; ?>
             <form method="POST">
                 <div class="form-group">
