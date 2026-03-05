@@ -24,7 +24,7 @@ if ($safe_browser_only) {
         <h1>Access Restricted</h1>
         <p>This website can only be opened using the <strong>Safe Exam Browser</strong>.</p>
         <p>Please launch the Safe Exam Browser to access the digital library.</p>
-        <a href='https://safeexambrowser.org/download_en.html'>Download Safe Exam Browser</a>
+        <a target='_blank' href='https://safeexambrowser.org/download_en.html'>Download Safe Exam Browser</a>
     </div>
 </body>
 </html>");
