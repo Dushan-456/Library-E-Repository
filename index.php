@@ -81,6 +81,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PGIM Digital Library</title>
+    <link rel="icon" type="image/x-icon" href="./assets/img/logo without bg.png">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -89,8 +90,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
     <!-- Top Global Header -->
     <header class="main-header">
         <div class="header-left">
-            <img src="./assets/img/logo.png" alt="PGIM Logo">
-            <h1>PGIM Digital Library</h1>
+            <img src="./assets/img/pgim booking.png" alt="PGIM Logo">
+            
         </div>
           <div class="search-container">
                     <i class="fas fa-search"></i>
@@ -112,7 +113,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>Library Menu</h2>
+                <h2>PGIM E-Library</h2>
             </div>
             <nav class="sidebar-nav">
                 <ul>
@@ -130,6 +131,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
                     </li>
                 </ul>
             </nav>
+            <div class="sidebar-footer">
+                <p>&copy; 2026 PGIM Library -V1.0</p>
+                <p>Developed by <a target="_blank" href="https://dushanportfolio.textaworld.com/">Dushan</a></p>
+            </div>
         </aside>
 
         <!-- Main Content -->
