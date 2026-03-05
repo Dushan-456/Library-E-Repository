@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/seb_check.php';
 
 // Hard-coded credentials
 $valid_username = "admin";
