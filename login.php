@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - PGIM Digital Library</title>
+    <link rel="icon" type="image/x-icon" href="./assets/img/logo without bg.png">
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -88,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-bottom: 1rem;
         }
         .login-body{
-            background-image: url('./assets/img/bg.jpeg') , linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+            background-image: url('./assets/img/bg.png') , linear-gradient( rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0.68));
             background-size: cover;
             background-position: center;
             background-blend-mode: overlay;
@@ -100,18 +101,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             height: 100vh;
         }
         .logo{
-            width: 100px;
-            height: 100px;
+            width: 130px;
+            height: 130px;
         }
     </style>
 </head>
 <body >
     <div class="login-body">
 
-        <img class="logo" src="./assets/img/logo.png" alt="PGIM Logo">
+        <img class="logo" src="./assets/img/logo without bg.png" alt="PGIM Logo">
         <div class="login-card">
             <div class="login-header">
-                <h2>PGIM Digital Library</h2>
+                <h2>PGIM E-Library</h2>
                 <p style="color: #64748b; font-size: 0.875rem;">Please login to access the library Resources</p>
             </div>
             <?php if ($error): ?>
