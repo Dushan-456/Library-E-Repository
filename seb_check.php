@@ -1,7 +1,7 @@
 <?php
 // Set to true to ONLY allow access via Safe Exam Browser (SEB)
 // Set to false to allow any browser
-$safe_browser_only = true;
+$safe_browser_only = false;
 
 if ($safe_browser_only) {
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
