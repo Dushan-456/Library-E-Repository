@@ -146,6 +146,73 @@ if ($fullPath === false || !is_file($fullPath)) {
             display: block;
         }
 
+        /* Search Panel Styling */
+        .search-panel {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            padding: 10px;
+        }
+
+        .search-input-container {
+            display: flex;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 5px 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .search-input-container input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 0.9rem;
+            padding: 5px;
+        }
+
+        .search-results {
+            flex: 1;
+            overflow-y: auto;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .search-result-item {
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .search-result-item:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .search-result-page {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .search-result-snippet {
+            color: #495057;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .sidebar-header i.active {
+            color: #007bff;
+            background: rgba(0,123,255,0.1);
+            border-radius: 4px;
+            padding: 4px;
+        }
+
         /* Continuous Scroll Viewport */
         .main-viewer {
             flex: 1;
@@ -241,12 +308,19 @@ if ($fullPath === false || !is_file($fullPath)) {
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-th-large" title="Thumbnails"></i>
-                <i class="fas fa-list-ul" title="Outline"></i>
-                <i class="fas fa-search" title="Search"></i>
+                <i class="fas fa-list-ul active" id="btnShowOutline" title="Outline"></i>
+                <i class="fas fa-search" id="btnShowSearch" title="Search"></i>
             </div>
             <div class="outline-container" id="outlineContainer">
                 <ul class="outline-tree" id="outlineRoot"></ul>
+            </div>
+            <div class="search-panel" id="searchPanel">
+                <div class="search-input-container">
+                    <input type="text" id="pdfSearchInput" placeholder="Search in document...">
+                    <i class="fas fa-search" style="color: #6c757d; font-size: 0.9rem;"></i>
+                </div>
+                <div id="searchStatus" style="font-size: 0.8rem; color: #6c757d; margin-bottom: 10px; display: none;"></div>
+                <ul class="search-results" id="searchResults"></ul>
             </div>
         </aside>
 
@@ -274,6 +348,11 @@ if ($fullPath === false || !is_file($fullPath)) {
         const url = 'stream_pdf.php?file=<?php echo urlencode($file); ?>';
         const pdfViewport = document.getElementById('pdfViewport');
         const outlineRoot = document.getElementById('outlineRoot');
+        const outlineContainer = document.getElementById('outlineContainer');
+        const searchPanel = document.getElementById('searchPanel');
+        const searchResults = document.getElementById('searchResults');
+        const pdfSearchInput = document.getElementById('pdfSearchInput');
+        const searchStatus = document.getElementById('searchStatus');
         
         let pdfDoc = null;
         let scale = 1.3;
@@ -423,6 +502,76 @@ if ($fullPath === false || !is_file($fullPath)) {
             renderedPages.clear();
             pdfViewport.innerHTML = '';
             await initViewer();
+        }
+
+        // Tab Switching
+        document.getElementById('btnShowOutline').onclick = function() {
+            this.classList.add('active');
+            document.getElementById('btnShowSearch').classList.remove('active');
+            outlineContainer.style.display = 'block';
+            searchPanel.style.display = 'none';
+        };
+
+        document.getElementById('btnShowSearch').onclick = function() {
+            this.classList.add('active');
+            document.getElementById('btnShowOutline').classList.remove('active');
+            outlineContainer.style.display = 'none';
+            searchPanel.style.display = 'flex';
+            pdfSearchInput.focus();
+        };
+
+        // PDF Search Logic
+        let searchTimeout;
+        pdfSearchInput.oninput = () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(executeSearch, 500);
+        };
+
+        async function executeSearch() {
+            const query = pdfSearchInput.value.trim().toLowerCase();
+            searchResults.innerHTML = '';
+            
+            if (query.length < 3) {
+                searchStatus.style.display = 'none';
+                return;
+            }
+
+            searchStatus.textContent = 'Searching...';
+            searchStatus.style.display = 'block';
+
+            let matches = 0;
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const textContent = await page.getTextContent();
+                const text = textContent.items.map(item => item.str).join(' ');
+                
+                if (text.toLowerCase().includes(query)) {
+                    const index = text.toLowerCase().indexOf(query);
+                    const snippet = text.substring(Math.max(0, index - 40), Math.min(text.length, index + 60));
+                    
+                    const li = document.createElement('li');
+                    li.className = 'search-result-item';
+                    li.innerHTML = `
+                        <span class="search-result-page">Page ${i}</span>
+                        <div class="search-result-snippet">...${snippet}...</div>
+                    `;
+                    li.onclick = () => {
+                        const targetPage = document.getElementById(`page-container-${i}`);
+                        if (targetPage) {
+                            pdfViewport.scrollTo({
+                                top: targetPage.offsetTop - 10,
+                                behavior: 'smooth'
+                            });
+                        }
+                    };
+                    searchResults.appendChild(li);
+                    matches++;
+                }
+                
+                if (matches > 50) break; // Limit results
+            }
+
+            searchStatus.textContent = matches === 0 ? 'No matches found' : `Found ${matches} matches`;
         }
 
         initViewer();
