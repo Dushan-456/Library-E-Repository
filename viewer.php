@@ -386,15 +386,23 @@ if ($fullPath === false || !is_file($fullPath)) {
                 }
 
                 wrap.onclick = async () => {
-                    if (item.dest) {
-                        const dest = await pdfDoc.getDestination(item.dest);
-                        const pageIdx = await pdfDoc.getPageIndex(dest[0]);
-                        const targetPage = document.getElementById(`page-container-${pageIdx + 1}`);
-                        if (targetPage) {
-                            pdfViewport.scrollTo({
-                                top: targetPage.offsetTop - 10,
-                                behavior: 'smooth'
-                            });
+                    let dest = item.dest;
+                    if (typeof dest === 'string') {
+                        dest = await pdfDoc.getDestination(dest);
+                    }
+                    
+                    if (dest && Array.isArray(dest)) {
+                        try {
+                            const pageIdx = await pdfDoc.getPageIndex(dest[0]);
+                            const targetPage = document.getElementById(`page-container-${pageIdx + 1}`);
+                            if (targetPage) {
+                                pdfViewport.scrollTo({
+                                    top: targetPage.offsetTop - 10,
+                                    behavior: 'smooth'
+                                });
+                            }
+                        } catch (err) {
+                            console.error('Error navigating to destination:', err);
                         }
                     }
                 };
