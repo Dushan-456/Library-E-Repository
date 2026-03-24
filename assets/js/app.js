@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Sidebar navigation
-  document.querySelectorAll(".sidebar-nav li").forEach((li) => {
+  document.querySelectorAll(".sidebar-nav li[data-folder]").forEach((li) => {
     li.onclick = () => {
       document
         .querySelectorAll(".sidebar-nav li")
