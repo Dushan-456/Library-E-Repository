@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/seb_check.php';
 
 // Authentication Check
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || !isset($_SESSION['role'])) {
     header("Location: login.php");
     exit;
 }
@@ -175,6 +175,20 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
                     <li data-folder="PGIM Academic Publication">
                         <i class="fas fa-graduation-cap"></i> <span>PGIM Academic Publications</span>
                     </li>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                        <li style="margin-top: 1rem; padding-left: 1.5rem; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; cursor: default; pointer-events: none; border: none;">
+                            Admin Panel
+                        </li>
+                        <li onclick="window.location.href='admin_create_user.php'">
+                            <i class="fas fa-user-plus"></i> <span>Add New User</span>
+                        </li>
+                        <li onclick="window.location.href='admin_users.php'">
+                            <i class="fas fa-users"></i> <span>All Users</span>
+                        </li>
+                        <li onclick="window.location.href='admin_activity.php'">
+                            <i class="fas fa-history"></i> <span>User Activity Logs</span>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </nav>
             <div class="sidebar-footer">
