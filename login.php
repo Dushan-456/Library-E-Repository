@@ -3,8 +3,8 @@ session_start();
 require_once __DIR__ . '/seb_check.php';
 
 // Hard-coded credentials
-$valid_username = "admin";
-$valid_password = "password123";
+$valid_username = "PGIM";
+$valid_password = "pgim@2026";
 
 $error = "";
 $message = "";
