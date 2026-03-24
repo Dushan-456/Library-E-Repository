@@ -159,27 +159,27 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>PGIM E-Library</h2>
+                <h2>PGIM Digital Library</h2>
             </div>
             <nav class="sidebar-nav">
                 <ul>
                     <li class="active" data-folder="">
                         <i class="fas fa-home"></i> <span>Home</span>
                     </li>
-                    <li data-folder="ClinicalKey/Books">
+                    <li data-folder="E Books & Jounals/Books">
                         <i class="fas fa-book"></i> <span>Books</span>
                     </li>
-                    <li data-folder="ClinicalKey/Journals">
+                    <li data-folder="E Books & Jounals/Journals">
                         <i class="fas fa-journal-whills"></i> <span>Journals</span>
                     </li>
-                    <li data-folder="Thesis & Dissertation">
-                        <i class="fas fa-graduation-cap"></i> <span>Theses</span>
+                    <li data-folder="PGIM Academic Publication">
+                        <i class="fas fa-graduation-cap"></i> <span>PGIM Academic Publications</span>
                     </li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
                 <p>&copy; 2026 PGIM Library -V1.0</p>
-                <p>Developed by <a target="_blank" href="https://dushanportfolio.textaworld.com/">Dushan</a></p>
+                <p>Developed by PGIM IT Unit</p>
             </div>
         </aside>
 
@@ -190,7 +190,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
                     <i class="fas fa-arrow-left"></i>
                 </button>
                 <div class="breadcrumb" id="breadcrumb" style="margin-left: 1rem;">
-                    <span>Library</span>
                 </div>
             </header>
 
