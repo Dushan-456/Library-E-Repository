@@ -121,19 +121,19 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="welcome-slider-container">
                 <div class="welcome-slider">
-                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'ClinicalKey/Books\\']').click()">
-                        <i class="fas fa-book-medical"></i>
-                        <h3>ClinicalKey Books</h3>
+                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'E Books & Jounals/Books\\']').click()">
+                        <i class="fas fa-book"></i>
+                        <h3>Books</h3>
                         <p>Access thousands of medical texts</p>
                     </div>
-                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'ClinicalKey/Journals\\']').click()">
-                        <i class="fas fa-microscope"></i>
-                        <h3>Clinical Journals</h3>
+                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'E Books & Jounals/Journals\\']').click()">
+                        <i class="fas fa-address-card"></i>
+                        <h3>Journals</h3>
                         <p>Stay updated with latest research</p>
                     </div>
-                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'Thesis & Dissertation\\']').click()">
+                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'PGIM Academic Publication\\']').click()">
                         <i class="fas fa-user-graduate"></i>
-                        <h3>Theses & Dissertations</h3>
+                        <h3>PGIM Academic Publications</h3>
                         <p>Explore postgraduate work</p>
                     </div>
                 </div>
@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateBreadcrumb(path) {
     const parts = path.split("/").filter((p) => p);
-    breadcrumb.innerHTML = "<span onclick=\"loadFolder('')\">Library</span>";
+    breadcrumb.innerHTML = "<span onclick=\"loadFolder('')\"></span>";
 
     let cumulativePath = "";
     parts.forEach((part, index) => {
