@@ -1,14 +1,15 @@
 <?php
 // Define the mapping of virtual folders to physical drives/folders
 $LIBRARY_MAPPINGS = [
-    'ClinicalKey' => 'D:\ClinicalKey',
-    'Thesis & Dissertation' => 'E:\Thesis & Dissertation',
+    'E Books & Jounals' => 'D:\E Books & Jounals',
+    'PGIM Academic Publication' => 'E:\PGIM Academic Publication',
     'DEFAULT' => __DIR__ . DIRECTORY_SEPARATOR . 'E Resources'
 ];
 
 /**
  * Maps a virtual path (e.g., 'ClinicalKey/Books/book.pdf') to an absolute physical path
  */
+
 function getPhysicalPath($virtualPath) {
     global $LIBRARY_MAPPINGS;
     
