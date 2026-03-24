@@ -2,9 +2,7 @@
 session_start();
 require_once __DIR__ . '/seb_check.php';
 
-// Hard-coded credentials
-$valid_username = "PGIM";
-$valid_password = "pgim@2026";
+require_once __DIR__ . '/db_config.php';
 
 $error = "";
 $message = "";
@@ -18,10 +16,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    if ($username === $valid_username && $password === $valid_password) {
+    // Check user in database
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? OR id_number = ?");
+    $stmt->execute([$username, $username]);
+    $user = $stmt->fetch();
+
+    if ($user && password_verify($password, $user['password_hash'])) {
         $_SESSION['loggedin'] = true;
-        $_SESSION['username'] = $username;
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = trim($user['first_name'] . ' ' . $user['last_name']);
+        $_SESSION['role'] = $user['role'];
         $_SESSION['last_activity'] = time(); // Initialize activity time
+        
+        // Log the login activity
+        $logStmt = $pdo->prepare("INSERT INTO activity_logs (user_id, login_time) VALUES (?, NOW())");
+        $logStmt->execute([$user['id']]);
+        $_SESSION['login_log_id'] = $pdo->lastInsertId();
+
         header("Location: index.php");
         exit;
     } else {
