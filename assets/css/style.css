@@ -21,6 +21,7 @@ body {
   background-color: var(--bg-main);
   color: var(--text-main);
   overflow: hidden;
+  width: 100%;
 }
 
 .app-container {
@@ -205,7 +206,7 @@ justify-content: space-between;
 }
 
 .search-container {
-  flex: 0 0 1000px;
+  flex: 0 0 600px;
   position: relative;
   display: flex;
   align-items: center;
