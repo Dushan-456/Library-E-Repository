@@ -39,6 +39,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         $error = "Please fill in all required fields (First Name, Last Name, Email, ID Number).";
     }
 }
+
+// Handle CSV Upload
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'upload_csv') {
+    if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] == UPLOAD_ERR_OK) {
+        $file_tmp = $_FILES['csv_file']['tmp_name'];
+        if (($handle = fopen($file_tmp, "r")) !== FALSE) {
+            $successCount = 0;
+            $errorCount = 0;
+            $row = 0;
+            
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                $row++;
+                if ($row === 1 && (stripos($data[0] ?? '', 'name') !== false || stripos($data[0] ?? '', 'first') !== false)) {
+                    continue; // Skip header
+                }
+                
+                $first_name = trim($data[0] ?? '');
+                $last_name = trim($data[1] ?? '');
+                $email = trim($data[2] ?? '');
+                $id_number = trim($data[3] ?? '');
+                $speciality = trim($data[4] ?? '');
+                $slms_number = trim($data[5] ?? '');
+                
+                if ($first_name && $last_name && $email && $id_number) {
+                    try {
+                        $password_hash = password_hash($id_number, PASSWORD_DEFAULT);
+                        $role = 'User';
+                        $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, speciality, id_number, slms_number, role, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$first_name, $last_name, $email, $speciality, $id_number, $slms_number, $role, $password_hash]);
+                        $successCount++;
+                    } catch (PDOException $e) {
+                        $errorCount++;
+                    }
+                } elseif (array_filter($data)) {
+                    $errorCount++;
+                }
+            }
+            fclose($handle);
+            
+            if ($successCount > 0) {
+                $message = "CSV process complete! $successCount user(s) created successfully.";
+            }
+            if ($errorCount > 0) {
+                $errorMsg = "$errorCount record(s) failed (missing required fields or already exist).";
+                $error = $error ? ($error . " | " . $errorMsg) : $errorMsg;
+            }
+            if ($successCount == 0 && $errorCount == 0 && !$error) {
+                $error = "The uploaded CSV file was empty or valid data not found.";
+            }
+        } else {
+            $error = "Error opening the uploaded file.";
+        }
+    } else {
+        $error = "Please upload a valid CSV file.";
+    }
+}
 $activePage = 'create_user';
 ?>
 <!DOCTYPE html>
@@ -52,6 +108,14 @@ $activePage = 'create_user';
     <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
     <style>
         .admin-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .forms-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+        .csv-instructions { background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px dashed var(--border); font-size: 0.9rem; color: #64748b; }
+        .csv-instructions ul { margin-left: 1.5rem; margin-top: 0.5rem; }
+        .file-upload-wrapper { position: relative; width: 100%; height: 150px; border: 2px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #f8fafc; transition: all 0.2s; cursor: pointer; text-align: center; padding: 1rem; }
+        .file-upload-wrapper:hover { border-color: var(--primary); background: #eff6ff; }
+        .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .file-upload-wrapper i { font-size: 2.5rem; color: var(--primary); margin-bottom: 0.5rem; }
+        @media (max-width: 1024px) { .forms-container { grid-template-columns: 1fr; } }
         .admin-header h2 { margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); color: var(--primary); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
@@ -126,40 +190,78 @@ $activePage = 'create_user';
                     <div class="message error"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
 
-                <div class="admin-card">
-                    <form method="POST" action="admin_create_user.php">
-                        <input type="hidden" name="action" value="create_user">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>First Name *</label>
-                                <input type="text" name="first_name" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Last Name *</label>
-                                <input type="text" name="last_name" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Email *</label>
-                                <input type="email" name="email" required>
-                            </div>
-                            <div class="form-group">
-                                <label>ID Number *</label>
-                                <input type="text" name="id_number" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Speciality</label>
-                                <input type="text" name="speciality">
-                            </div>
-                            <div class="form-group">
-                                <label>SLMS Number</label>
-                                <input type="text" name="slms_number">
-                            </div>
+                <div class="forms-container">
+                    <div class="admin-card">
+                        <div class="admin-header">
+                            <h2><i class="fas fa-user-edit"></i> Add Single User</h2>
                         </div>
-                        <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Create User</button>
-                    </form>
+                        <form method="POST" action="admin_create_user.php">
+                            <input type="hidden" name="action" value="create_user">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>First Name *</label>
+                                    <input type="text" name="first_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Last Name *</label>
+                                    <input type="text" name="last_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Email *</label>
+                                    <input type="email" name="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>ID Number *</label>
+                                    <input type="text" name="id_number" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Speciality</label>
+                                    <input type="text" name="speciality">
+                                </div>
+                                <div class="form-group">
+                                    <label>SLMS Number</label>
+                                    <input type="text" name="slms_number">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Create User</button>
+                        </form>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="admin-header">
+                            <h2><i class="fas fa-file-csv"></i> Upload Multiple Users (CSV)</h2>
+                        </div>
+                        <div class="csv-instructions">
+                            <strong>CSV Format Required:</strong>
+                            <ul>
+                                <li>Column 1: First Name *</li>
+                                <li>Column 2: Last Name *</li>
+                                <li>Column 3: Email *</li>
+                                <li>Column 4: ID Number *</li>
+                                <li>Column 5: Speciality</li>
+                                <li>Column 6: SLMS Number</li>
+                            </ul>
+                            <em>Note: The first row will be skipped if it contains headers. Password defaults to ID Number.</em>
+                        </div>
+                        <form method="POST" action="admin_create_user.php" enctype="multipart/form-data">
+                            <input type="hidden" name="action" value="upload_csv">
+                            <div class="file-upload-wrapper">
+                                <input type="file" name="csv_file" accept=".csv" required id="csvFileInput">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span id="fileNameDisplay">Drag & Drop or Click to Upload CSV</span>
+                            </div>
+                            <button type="submit" class="btn-submit" style="width: 100%; margin-top: 1rem;"><i class="fas fa-upload"></i> Upload & Create Users</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
+    <script>
+        document.getElementById('csvFileInput').addEventListener('change', function(e) {
+            var fileName = e.target.files[0] ? e.target.files[0].name : 'Drag & Drop or Click to Upload CSV';
+            document.getElementById('fileNameDisplay').textContent = fileName;
+        });
+    </script>
 </body>
 </html>
