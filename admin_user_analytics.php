@@ -138,7 +138,7 @@ function formatDuration($seconds) {
                             <p style="color: var(--text-muted); font-size: 0.9rem;">
                                 <strong>Email:</strong> <?= htmlspecialchars($u['email']) ?> | 
                                 <strong>ID:</strong> <?= htmlspecialchars($u['id_number']) ?> | 
-                                <strong>SLMC:</strong> <?= htmlspecialchars($u['slms_number'] ?? 'N/A') ?>
+                                <strong>SLMC:</strong> <?= htmlspecialchars($u['slmc_number'] ?? 'N/A') ?>
                             </p>
                         </div>
                         <a href="admin_users.php" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Users</a>
