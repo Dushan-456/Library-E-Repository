@@ -18,16 +18,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $email = trim($_POST['email'] ?? '');
     $speciality = trim($_POST['speciality'] ?? '');
     $id_number = trim($_POST['id_number'] ?? '');
-    $slms_number = trim($_POST['slms_number'] ?? '');
+    $slmc_number = trim($_POST['slmc_number'] ?? '');
     
     if ($first_name && $last_name && $email && $id_number) {
         try {
-            $password_hash = password_hash($id_number, PASSWORD_DEFAULT);
+            $raw_password = preg_replace('/V$/', 'v', $id_number);
+            $password_hash = password_hash($raw_password, PASSWORD_DEFAULT);
             $role = 'User';
 
-            $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, speciality, id_number, slms_number, role, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$first_name, $last_name, $email, $speciality, $id_number, $slms_number, $role, $password_hash]);
-            $message = "User created successfully! Their password is set to their ID Number ($id_number).";
+            $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, speciality, id_number, slmc_number, role, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$first_name, $last_name, $email, $speciality, $id_number, $slmc_number, $role, $password_hash]);
+            $message = "User created successfully! Their password is set to their ID Number ($raw_password).";
         } catch (PDOException $e) {
             if ($e->getCode() == 23000) {
                 $error = "Error: Email or ID Number already exists.";
@@ -47,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         if (($handle = fopen($file_tmp, "r")) !== FALSE) {
             $successCount = 0;
             $errorCount = 0;
+            $existingUsers = [];
             $row = 0;
             
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
@@ -60,17 +62,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 $email = trim($data[2] ?? '');
                 $id_number = trim($data[3] ?? '');
                 $speciality = trim($data[4] ?? '');
-                $slms_number = trim($data[5] ?? '');
+                $slmc_number = trim($data[5] ?? '');
                 
                 if ($first_name && $last_name && $email && $id_number) {
                     try {
-                        $password_hash = password_hash($id_number, PASSWORD_DEFAULT);
+                        $raw_password = preg_replace('/V$/', 'v', $id_number);
+                        $password_hash = password_hash($raw_password, PASSWORD_DEFAULT);
                         $role = 'User';
-                        $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, speciality, id_number, slms_number, role, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                        $stmt->execute([$first_name, $last_name, $email, $speciality, $id_number, $slms_number, $role, $password_hash]);
+                        $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, speciality, id_number, slmc_number, role, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$first_name, $last_name, $email, $speciality, $id_number, $slmc_number, $role, $password_hash]);
                         $successCount++;
                     } catch (PDOException $e) {
                         $errorCount++;
+                        if ($e->getCode() == 23000) {
+                            $existingUsers[] = $email . ' (' . $id_number . ')';
+                        }
                     }
                 } elseif (array_filter($data)) {
                     $errorCount++;
@@ -82,7 +88,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 $message = "CSV process complete! $successCount user(s) created successfully.";
             }
             if ($errorCount > 0) {
-                $errorMsg = "$errorCount record(s) failed (missing required fields or already exist).";
+                $errorMsg = "$errorCount record(s) failed";
+                if (!empty($existingUsers)) {
+                    $errorMsg .= ". Already exists: " . implode(", ", $existingUsers);
+                } else {
+                    $errorMsg .= " (missing required fields or database error).";
+                }
                 $error = $error ? ($error . " | " . $errorMsg) : $errorMsg;
             }
             if ($successCount == 0 && $errorCount == 0 && !$error) {
@@ -219,8 +230,8 @@ $activePage = 'create_user';
                                     <input type="text" name="speciality">
                                 </div>
                                 <div class="form-group">
-                                    <label>SLMS Number</label>
-                                    <input type="text" name="slms_number">
+                                    <label>SLMC Number</label>
+                                    <input type="text" name="slmc_number">
                                 </div>
                             </div>
                             <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Create User</button>
@@ -239,7 +250,7 @@ $activePage = 'create_user';
                                 <li>Column 3: Email *</li>
                                 <li>Column 4: ID Number *</li>
                                 <li>Column 5: Speciality</li>
-                                <li>Column 6: SLMS Number</li>
+                                <li>Column 6: SLMC Number</li>
                             </ul>
                             <em>Note: The first row will be skipped if it contains headers. Password defaults to ID Number.</em>
                         </div>
