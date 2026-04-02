@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     speciality VARCHAR(255),
     id_number VARCHAR(100) NOT NULL UNIQUE,
-    slms_number VARCHAR(100),
+    slmc_number VARCHAR(100),
     role ENUM('Admin', 'User') DEFAULT 'User',
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -29,14 +29,14 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 
 -- Insert initial Admin user
 -- Password is 'password' (bcrypt hash)
-INSERT INTO users (first_name, last_name, email, speciality, id_number, slms_number, role, password_hash)
+INSERT INTO users (first_name, last_name, email, speciality, id_number, slmc_number, role, password_hash)
 VALUES (
     'Admin',
     'User',
     'admin@pgim.lk',
     'Administration',
     'ADM001',
-    'SLMS001',
+    'SLMC001',
     'Admin',
     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'
 )
