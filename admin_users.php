@@ -13,7 +13,7 @@ $search = $_GET['search'] ?? '';
 
 try {
     if ($search !== '') {
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email LIKE ? OR slms_number LIKE ? ORDER BY created_at DESC");
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email LIKE ? OR slmc_number LIKE ? ORDER BY created_at DESC");
         $stmt->execute(["%$search%", "%$search%"]);
     } else {
         $stmt = $pdo->query("SELECT * FROM users ORDER BY created_at DESC");
@@ -127,7 +127,7 @@ $activePage = 'all_users';
                                         <td><?php echo htmlspecialchars($u['first_name'] . ' ' . $u['last_name']); ?></td>
                                         <td><?php echo htmlspecialchars($u['email']); ?></td>
                                         <td><?php echo htmlspecialchars($u['id_number']); ?></td>
-                                        <td><?php echo htmlspecialchars($u['slms_number'] ?? '-'); ?></td>
+                                        <td><?php echo htmlspecialchars($u['slmc_number'] ?? '-'); ?></td>
                                         <td><?php echo htmlspecialchars($u['role']); ?></td>
                                         <td>
                                             <a href="admin_user_analytics.php?id=<?= $u['id'] ?>" class="btn-view"><i class="fas fa-chart-line"></i> Analytics</a>
