@@ -117,20 +117,21 @@ $activePage = 'create_user';
     <link rel="icon" type="image/x-icon" href="./assets/img/logo without bg.png">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
+    <script src="assets/js/theme.js?v=<?php echo time(); ?>"></script>
     <style>
-        .admin-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .admin-card { background: var(--bg-card); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; }
         .forms-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
-        .csv-instructions { background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px dashed var(--border); font-size: 0.9rem; color: #64748b; }
+        .csv-instructions { background: var(--bg-main); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px dashed var(--border); font-size: 0.9rem; color: var(--text-muted); }
         .csv-instructions ul { margin-left: 1.5rem; margin-top: 0.5rem; }
-        .file-upload-wrapper { position: relative; width: 100%; height: 150px; border: 2px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #f8fafc; transition: all 0.2s; cursor: pointer; text-align: center; padding: 1rem; }
-        .file-upload-wrapper:hover { border-color: var(--primary); background: #eff6ff; }
+        .file-upload-wrapper { position: relative; width: 100%; height: 150px; border: 2px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; background: var(--bg-main); transition: all 0.2s; cursor: pointer; text-align: center; padding: 1rem; color: var(--text-muted); }
+        .file-upload-wrapper:hover { border-color: var(--primary); background: var(--bg-active); }
         .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
         .file-upload-wrapper i { font-size: 2.5rem; color: var(--primary); margin-bottom: 0.5rem; }
         @media (max-width: 1024px) { .forms-container { grid-template-columns: 1fr; } }
         .admin-header h2 { margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); color: var(--primary); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; outline: none; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-main); }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; outline: none; background: var(--bg-input); color: var(--text-main); }
         .form-group input:focus { border-color: var(--primary); }
         .btn-submit { padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 1.5rem; }
         .btn-submit:hover { background: var(--primary-hover); }
@@ -138,16 +139,19 @@ $activePage = 'create_user';
         .success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         .sidebar-nav li { padding: 0.875rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s; color: var(--text-muted); font-weight: 500;}
-        .sidebar-nav li:hover { background-color: #f1f5f9; color: var(--primary); }
-        .sidebar-nav li.active { background-color: #eff6ff; color: var(--primary); border-right: 3px solid var(--primary); }
+        .sidebar-nav li:hover { background-color: var(--bg-hover); color: var(--primary); }
+        .sidebar-nav li.active { background-color: var(--bg-active); color: var(--primary); border-right: 3px solid var(--primary); }
     </style>
 </head>
 <body>
     <header class="main-header">
         <div class="header-left">
-            <img src="./assets/img/pgim booking.png" alt="PGIM Logo">
+            <img src="./assets/img/pgim logo black.png" alt="PGIM Logo">
         </div>
         <div class="header-right">
+            <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
+                <div class="theme-toggle-knob"><i class="fas fa-sun"></i></div>
+            </button>
             <div class="user-profile">
                 <i class="fas fa-user-circle"></i>
                 <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
