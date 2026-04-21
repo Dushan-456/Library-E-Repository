@@ -35,15 +35,16 @@ $activePage = 'activity';
     <link rel="icon" type="image/x-icon" href="./assets/img/logo without bg.png">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
+    <script src="assets/js/theme.js?v=<?php echo time(); ?>"></script>
     <style>
-        .admin-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; overflow-x: auto; }
+        .admin-card { background: var(--bg-card); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th, td { text-align: left; padding: 1rem; border-bottom: 1px solid var(--border); }
-        th { background-color: #f8fafc; font-weight: 600; color: var(--text); }
-        tr:hover { background-color: #f1f5f9; }
+        th, td { text-align: left; padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-main); }
+        th { background-color: var(--bg-main); font-weight: 600; }
+        tr:hover { background-color: var(--bg-hover); }
         .sidebar-nav li { padding: 0.875rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s; color: var(--text-muted); font-weight: 500;}
-        .sidebar-nav li:hover { background-color: #f1f5f9; color: var(--primary); }
-        .sidebar-nav li.active { background-color: #eff6ff; color: var(--primary); border-right: 3px solid var(--primary); }
+        .sidebar-nav li:hover { background-color: var(--bg-hover); color: var(--primary); }
+        .sidebar-nav li.active { background-color: var(--bg-active); color: var(--primary); border-right: 3px solid var(--primary); }
     </style>
 </head>
 <body>
@@ -52,6 +53,9 @@ $activePage = 'activity';
             <img src="./assets/img/pgim booking.png" alt="PGIM Logo">
         </div>
         <div class="header-right">
+            <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
+                <div class="theme-toggle-knob"><i class="fas fa-sun"></i></div>
+            </button>
             <div class="user-profile">
                 <i class="fas fa-user-circle"></i>
                 <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
