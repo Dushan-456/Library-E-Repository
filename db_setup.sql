@@ -28,16 +28,16 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 );
 
 -- Insert initial Admin user
--- Password is 'password' (bcrypt hash)
+-- Password is 'PgimLibrary@2026' (bcrypt hash)
 INSERT INTO users (first_name, last_name, email, speciality, id_number, slmc_number, role, password_hash)
 VALUES (
     'Admin',
     'User',
-    'admin@pgim.lk',
+    'library.admin@pgim.ac.lk',
     'Administration',
     'ADM001',
     'SLMC001',
     'Admin',
-    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'
+    '$2b$10$w6Xq0sXx7QzWcH9xJ6i8hOQ5yZQxG7Z9kVQ8W3H0F1g7YxYt6c9Qy'
 )
 ON DUPLICATE KEY UPDATE id_number=id_number;
