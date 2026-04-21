@@ -141,8 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <?php endif; ?>
             <form method="POST">
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" required placeholder="Username">
+                    <label>PGIM Email</label>
+                    <input type="text" name="username" required placeholder="PGIM Email">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
