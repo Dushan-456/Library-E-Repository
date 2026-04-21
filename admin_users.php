@@ -34,21 +34,22 @@ $activePage = 'all_users';
     <link rel="icon" type="image/x-icon" href="./assets/img/logo without bg.png">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
+    <script src="assets/js/theme.js?v=<?php echo time(); ?>"></script>
     <style>
-        .admin-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; overflow-x: auto; }
+        .admin-card { background: var(--bg-card); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; overflow-x: auto; }
         .search-form { margin-bottom: 1.5rem; display: flex; gap: 1rem; }
-        .search-form input { padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; outline: none; flex: 1; max-width: 400px; }
+        .search-form input { padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; outline: none; flex: 1; max-width: 400px; background: var(--bg-input); color: var(--text-main); }
         .search-form button { padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
         .search-form button:hover { background: var(--primary-hover); }
-        .btn-view { padding: 0.4rem 0.8rem; background: #cbd5e1; color: #0f172a; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: background 0.2s; white-space: nowrap; }
-        .btn-view:hover { background: #94a3b8; }
+        .btn-view { padding: 0.4rem 0.8rem; background: var(--bg-hover); color: var(--text-main); border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: background 0.2s; white-space: nowrap; }
+        .btn-view:hover { background: var(--border); }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th, td { text-align: left; padding: 1rem; border-bottom: 1px solid var(--border); }
-        th { background-color: #f8fafc; font-weight: 600; color: var(--text); }
-        tr:hover { background-color: #f1f5f9; }
+        th, td { text-align: left; padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-main); }
+        th { background-color: var(--bg-main); font-weight: 600; }
+        tr:hover { background-color: var(--bg-hover); }
         .sidebar-nav li { padding: 0.875rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s; color: var(--text-muted); font-weight: 500;}
-        .sidebar-nav li:hover { background-color: #f1f5f9; color: var(--primary); }
-        .sidebar-nav li.active { background-color: #eff6ff; color: var(--primary); border-right: 3px solid var(--primary); }
+        .sidebar-nav li:hover { background-color: var(--bg-hover); color: var(--primary); }
+        .sidebar-nav li.active { background-color: var(--bg-active); color: var(--primary); border-right: 3px solid var(--primary); }
     </style>
 </head>
 <body>
@@ -57,6 +58,9 @@ $activePage = 'all_users';
             <img src="./assets/img/pgim booking.png" alt="PGIM Logo">
         </div>
         <div class="header-right">
+            <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
+                <div class="theme-toggle-knob"><i class="fas fa-sun"></i></div>
+            </button>
             <div class="user-profile">
                 <i class="fas fa-user-circle"></i>
                 <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
