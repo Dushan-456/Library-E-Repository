@@ -131,12 +131,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
     
     <!-- pdf.js for rendering PDFs natively (Local for offline) -->
     <script src="./assets/pdfjs/pdf.min.js"></script>
+    <script src="assets/js/theme.js?v=<?php echo time(); ?>"></script>
 </head>
 <body>
     <!-- Top Global Header -->
     <header class="main-header">
         <div class="header-left">
-            <img src="./assets/img/pgim booking.png" alt="PGIM Logo">
+            <img src="./assets/img/pgim logo black.png" alt="PGIM Logo">
             
         </div>
           <div class="search-container">
@@ -144,6 +145,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
                     <input type="text" id="searchInput" placeholder="Search resources...">
                 </div>
         <div class="header-right">
+            <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
+                <div class="theme-toggle-knob"><i class="fas fa-sun"></i></div>
+            </button>
             <div class="user-profile">
                 <i class="fas fa-user-circle"></i>
                 <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
