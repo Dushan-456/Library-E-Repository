@@ -59,22 +59,23 @@ function formatDuration($seconds) {
     <link rel="icon" type="image/x-icon" href="./assets/img/logo without bg.png">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
+    <script src="assets/js/theme.js?v=<?php echo time(); ?>"></script>
     <style>
-        .admin-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; overflow-x: auto; }
+        .admin-card { background: var(--bg-card); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; overflow-x: auto; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .stat-box { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
+        .stat-box { background: var(--bg-main); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
         .stat-box h3 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
         .stat-box p { font-size: 2rem; font-weight: 700; color: var(--primary); margin: 0; }
         .user-header { border-bottom: 2px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; display:flex; justify-content: space-between; align-items:flex-end; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th, td { text-align: left; padding: 1rem; border-bottom: 1px solid var(--border); }
-        th { background-color: #f8fafc; font-weight: 600; color: var(--text); }
-        tr:hover { background-color: #f1f5f9; }
+        th, td { text-align: left; padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-main); }
+        th { background-color: var(--bg-main); font-weight: 600; }
+        tr:hover { background-color: var(--bg-hover); }
         .sidebar-nav li { padding: 0.875rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s; color: var(--text-muted); font-weight: 500;}
-        .sidebar-nav li:hover { background-color: #f1f5f9; color: var(--primary); }
-        .sidebar-nav li.active { background-color: #eff6ff; color: var(--primary); border-right: 3px solid var(--primary); }
-        .btn-back { padding: 0.5rem 1rem; background: #e2e8f0; color: #334155; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; }
-        .btn-back:hover { background: #cbd5e1; }
+        .sidebar-nav li:hover { background-color: var(--bg-hover); color: var(--primary); }
+        .sidebar-nav li.active { background-color: var(--bg-active); color: var(--primary); border-right: 3px solid var(--primary); }
+        .btn-back { padding: 0.5rem 1rem; background: var(--bg-hover); color: var(--text-main); text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; }
+        .btn-back:hover { background: var(--border); }
     </style>
 </head>
 <body>
@@ -83,6 +84,9 @@ function formatDuration($seconds) {
             <img src="./assets/img/pgim booking.png" alt="PGIM Logo">
         </div>
         <div class="header-right">
+            <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
+                <div class="theme-toggle-knob"><i class="fas fa-sun"></i></div>
+            </button>
             <div class="user-profile">
                 <i class="fas fa-user-circle"></i>
                 <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
