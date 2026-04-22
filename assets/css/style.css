@@ -121,6 +121,11 @@ body {
 
 .header-left img {
   height: 40px;
+  content: url('../img/pgim logo black.png');
+}
+
+[data-theme="dark"] .header-left img {
+  content: url('../img/pgim logo white.png');
 }
 
 .header-left h1 {
