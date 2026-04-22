@@ -146,12 +146,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         <li>Search bar allows keyword searching across all documents.</li>
                         <li>Click on any PDF to securely view it in the locked browser.</li>
                         <li>Downloading and printing are strictly prohibited.</li>
+                        <li>If you have any problem please contact Library Staff</li>
                     </ul>
                 </div>
                 
                 <div class="info-card privacy">
                     <h3><i class="fas fa-shield-alt"></i> Privacy & Security Notice</h3>
-                    <p>This system is monitored. Your IP address and session activity are recorded. Unauthorized distribution of materials found here is a violation of PGIM policy and may result in disciplinary action. <strong>Please log out when you are finished.</strong></p>
+                    <p>This system is monitored. Your Email address , SLMS Number , Name and session activity are recorded. Unauthorized distribution of materials found here is a violation of PGIM policy and may result in disciplinary action. <strong>Please log out when you are finished.</strong></p>
                 </div>
             </div>
             
