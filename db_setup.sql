@@ -28,6 +28,15 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Table for Document Access Logs
+CREATE TABLE IF NOT EXISTS document_access_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    access_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Insert initial Admin user
 -- Password is 'PgimLibrary@2026' (bcrypt hash)
 INSERT INTO users (first_name, last_name, email, speciality, id_number, slmc_number, role, status, password_hash)
