@@ -6,16 +6,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// 15-Minute Session Timeout (900 seconds)
-$timeout_duration = 900;
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
-    // Session expired
-    session_unset();
-    session_destroy();
-    header("Location: login.php?msg=timeout");
-    exit;
-}
-$_SESSION['last_activity'] = time(); // Update last activity time
+require_once __DIR__ . '/session_timeout.php';
 
 require_once __DIR__ . '/path_config.php';
 
@@ -34,6 +25,15 @@ if (!isPathSecure($physicalPath, $file)) {
 $fullPath = realpath($physicalPath);
 if ($fullPath === false || !is_file($fullPath)) {
     die("Invalid file path");
+}
+
+// Log Document Access
+require_once __DIR__ . '/db_config.php';
+try {
+    $logStmt = $pdo->prepare("INSERT INTO document_access_logs (user_id, file_path) VALUES (?, ?)");
+    $logStmt->execute([$_SESSION['user_id'], $file]);
+} catch (PDOException $e) {
+    // Silent fail for logging to ensure viewer still works
 }
 ?>
 <!DOCTYPE html>
@@ -273,14 +273,57 @@ if ($fullPath === false || !is_file($fullPath)) {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 5rem;
-            color: rgba(0,0,0,0.2);
-            font-weight: bold;
+            transform: translate(-50%, -50%) rotate(-40deg);
+            font-size: 6.5rem;
+            color: rgba(0,0,0,0.12);
+            font-weight: 800;
             pointer-events: none;
             user-select: none;
             z-index: 5;
-            white-space: nowrap;
+            white-space: pre-line;
+            text-align: center;
+            width: 100%;
+            line-height: 1.4;
+            text-transform: uppercase;
+        }
+        .page-watermark p {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) ;
+            font-size: 3.5rem;
+            color: rgba(0,0,0,0.12);
+            font-weight: 800;
+            pointer-events: none;
+            user-select: none;
+            z-index: 5;
+            white-space: pre-line;
+            text-align: center;
+            width: 100%;
+            line-height: 1.4;
+            text-transform: uppercase;
+        }
+
+        .viewer-footer {
+            height: 32px;
+            background: #2a2d2e;
+            color: #bdc1c6;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 0.75rem;
+            z-index: 30;
+            border-top: 1px solid #3c4043;
+        }
+
+        .user-security-info {
+           font-family: 'Courier New', Courier, monospace;
+           font-size: 0.8rem;
+           color: #8ab4f8;
+           background: rgba(138, 180, 248, 0.1);
+           padding: 4px 12px;
+           border-radius: 4px;
+           margin-left: 20px;
         }
 
         .filename-text {
@@ -296,6 +339,23 @@ if ($fullPath === false || !is_file($fullPath)) {
             padding: 4px 10px;
             border-radius: 4px;
             font-size: 0.9rem;
+        }
+
+        /* Night Mode (Color Inversion) */
+        .night-mode .page-container {
+            filter: invert(1) hue-rotate(180deg);
+            box-shadow: 0 0 10px rgba(255,255,255,0.1) !important;
+        }
+
+        .night-mode canvas {
+            opacity: 0.9; /* Slightly reduce brightness in dark mode */
+        }
+
+        .night-mode .page-watermark {
+            color: rgba(184, 184, 184, 0.53) !important; /* Adjust watermark for night mode */
+        }
+        .night-mode .page-watermark p {
+            color: rgba(184, 184, 184, 0.53) !important; /* Adjust watermark for night mode */
         }
 
         @media print {
@@ -332,7 +392,11 @@ if ($fullPath === false || !is_file($fullPath)) {
                 <div id="page-indicator">
                     <span id="current-page">1</span> / <span id="total-pages">0</span>
                 </div>
-                <div style="margin-left: auto;">
+                <div class="user-security-info">
+                    <i class="fas fa-shield-alt"></i> <?php echo htmlspecialchars($_SESSION['email']); ?>
+                </div>
+                <div style="margin-left: auto; display: flex; gap: 10px;">
+                    <button id="toggle-night-mode" title="Toggle Night Mode"><i class="fas fa-moon"></i></button>
                     <button id="zoom-out"><i class="fas fa-minus"></i></button>
                     <button id="zoom-in"><i class="fas fa-plus"></i></button>
                 </div>
@@ -341,11 +405,22 @@ if ($fullPath === false || !is_file($fullPath)) {
             <div class="pdf-viewport" id="pdfViewport">
                 <!-- Pages will be rendered here dynamically -->
             </div>
+
+            <footer class="viewer-footer">
+                <i class="fas fa-user-lock" style="margin-right: 8px;"></i>
+                <span>Secure access granted to: <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong> (SLMC: <?php echo htmlspecialchars($_SESSION['slmc_number']); ?>) | ID: <?php echo htmlspecialchars($_SESSION['id_number']); ?></span>
+                <span style="margin-left: auto; opacity: 0.7;">PGIM DIGITAL LIBRARY SECURITY SYSTEM &copy; 2026</span>
+            </footer>
         </main>
     </div>
 
     <script>
         const url = 'stream_pdf.php?file=<?php echo urlencode($file); ?>';
+        const userInfo = {
+            email: '<?php echo $_SESSION['email']; ?>',
+            idNumber: '<?php echo $_SESSION['id_number']; ?>',
+            slmcNumber: '<?php echo $_SESSION['slmc_number']; ?>'
+        };
         const pdfViewport = document.getElementById('pdfViewport');
         const outlineRoot = document.getElementById('outlineRoot');
         const outlineContainer = document.getElementById('outlineContainer');
@@ -423,7 +498,10 @@ if ($fullPath === false || !is_file($fullPath)) {
             // Add Watermark
             const watermark = document.createElement('div');
             watermark.className = 'page-watermark';
-            watermark.textContent = 'PGIM LIBRARY';
+            watermark.innerHTML = `PGIM LIBRARY<br>
+            <p>
+            ${userInfo.email}<br>ID: ${userInfo.idNumber}<br>SLMC: ${userInfo.slmcNumber}
+            </p>`;
             container.appendChild(watermark);
 
             await page.render({
@@ -575,6 +653,21 @@ if ($fullPath === false || !is_file($fullPath)) {
         }
 
         initViewer();
+
+        // Night Mode Logic
+        const btnNightMode = document.getElementById('toggle-night-mode');
+        const isNightMode = localStorage.getItem('nightMode') === 'true';
+
+        if (isNightMode) {
+            document.body.classList.add('night-mode');
+            btnNightMode.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+
+        btnNightMode.onclick = () => {
+            const active = document.body.classList.toggle('night-mode');
+            localStorage.setItem('nightMode', active);
+            btnNightMode.innerHTML = active ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        };
 
         // Security
         window.oncontextmenu = () => false;
