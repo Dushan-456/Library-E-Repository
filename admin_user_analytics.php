@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/seb_check.php';
 require_once __DIR__ . '/db_config.php';
 
 // Authentication Check
@@ -7,6 +8,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || !isset($_
     header("Location: index.php");
     exit;
 }
+
+require_once __DIR__ . '/session_timeout.php';
 
 $user_id = $_GET['id'] ?? null;
 if (!$user_id) {
@@ -32,6 +35,18 @@ try {
     $stmt3 = $pdo->prepare("SELECT * FROM activity_logs WHERE user_id = ? ORDER BY login_time DESC LIMIT 200");
     $stmt3->execute([$user_id]);
     $activities = $stmt3->fetchAll();
+    
+    // Fetch Most Viewed Documents for this user
+    $stmt4 = $pdo->prepare("
+        SELECT file_path, COUNT(*) as view_count 
+        FROM document_access_logs 
+        WHERE user_id = ? 
+        GROUP BY file_path 
+        ORDER BY view_count DESC 
+        LIMIT 10
+    ");
+    $stmt4->execute([$user_id]);
+    $mostViewed = $stmt4->fetchAll();
 } catch (PDOException $e) {
     die("Database Error: " . $e->getMessage());
 }
@@ -60,6 +75,7 @@ function formatDuration($seconds) {
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
     <script src="assets/js/theme.js?v=<?php echo time(); ?>"></script>
+    <script src="assets/js/chart.min.js"></script>
     <style>
         .admin-card { background: var(--bg-card); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; overflow-x: auto; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
@@ -76,6 +92,20 @@ function formatDuration($seconds) {
         .sidebar-nav li.active { background-color: var(--bg-active); color: var(--primary); border-right: 3px solid var(--primary); }
         .btn-back { padding: 0.5rem 1rem; background: var(--bg-hover); color: var(--text-main); text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; }
         .btn-back:hover { background: var(--border); }
+
+        /* User Chart Styles */
+        .user-chart-section {
+            margin: 2rem 0;
+            background: var(--bg-main);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .user-chart-container {
+            height: 350px;
+            width: 100%;
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -87,15 +117,29 @@ function formatDuration($seconds) {
             <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
                 <div class="theme-toggle-knob"><i class="fas fa-sun"></i></div>
             </button>
-            <div class="user-profile">
-                <i class="fas fa-user-circle"></i>
-                <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
-            </div>
+            <a href="profile.php" style="text-decoration: none; color: inherit;">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle"></i>
+                    <div class="user-info-text">
+                        <span class="user-name"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                    </div>
+                </div>
+            </a>
             <a href="logout.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </header>
 
     <div class="app-container">
+   <!-- Global Watermark -->
+        <div class="watermark">PGIM LIBRARY
+            <br>
+            <p>
+                <span>
+                    <?php echo  htmlspecialchars($_SESSION['email']) ; ?>
+                </span>
+                <?php echo   "ID: " . htmlspecialchars($_SESSION['id_number']) . " <br> SLMC: " . htmlspecialchars($_SESSION['slmc_number']); ?>
+            </p>
+            </div>
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -116,7 +160,10 @@ function formatDuration($seconds) {
                         <i class="fas fa-users"></i> <span>All Users</span>
                     </li>
                     <li class="<?= $activePage == 'activity' ? 'active' : '' ?>" onclick="window.location.href='admin_activity.php'">
-                        <i class="fas fa-history"></i> <span>User Activity Logs</span>
+                        <i class="fas fa-history"></i> <span>Library Analytics</span>
+                    </li>
+                    <li onclick="window.location.href='profile.php'">
+                        <i class="fas fa-id-card"></i> <span>My Profile</span>
                     </li>
                 </ul>
             </nav>
@@ -159,6 +206,13 @@ function formatDuration($seconds) {
                         </div>
                     </div>
 
+                    <h3 style="margin: 2rem 0 1rem; color: var(--text-main);"><i class="fas fa-book-reader"></i> Most Viewed Documents</h3>
+                    <div class="user-chart-section">
+                        <div class="user-chart-container">
+                            <canvas id="userPopularChart"></canvas>
+                        </div>
+                    </div>
+
                     <h3 style="margin-bottom: 1rem; color: var(--text-main);">Recent Activity Logs</h3>
                     <table>
                         <thead>
@@ -188,5 +242,46 @@ function formatDuration($seconds) {
             </div>
         </main>
     </div>
+    <script>
+        // Data from PHP
+        const userPopularLabels = <?php echo json_encode(array_map(function($item) { return basename($item['file_path']); }, $mostViewed)); ?>;
+        const userPopularValues = <?php echo json_encode(array_column($mostViewed, 'view_count')); ?>;
+
+        // Theme-aware Chart Config
+        Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim() || '#334155';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        if (userPopularLabels.length > 0) {
+            new Chart(document.getElementById('userPopularChart'), {
+                type: 'bar',
+                data: {
+                    labels: userPopularLabels,
+                    datasets: [{
+                        label: 'Your Views',
+                        data: userPopularValues,
+                        backgroundColor: 'rgba(56, 189, 248, 0.6)',
+                        borderColor: 'rgb(56, 189, 248)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { precision: 0 }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>
