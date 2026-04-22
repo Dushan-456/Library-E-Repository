@@ -22,19 +22,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password_hash'])) {
-        $_SESSION['loggedin'] = true;
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = trim($user['first_name'] . ' ' . $user['last_name']);
-        $_SESSION['role'] = $user['role'];
-        $_SESSION['last_activity'] = time(); // Initialize activity time
-        
-        // Log the login activity
-        $logStmt = $pdo->prepare("INSERT INTO activity_logs (user_id, login_time) VALUES (?, NOW())");
-        $logStmt->execute([$user['id']]);
-        $_SESSION['login_log_id'] = $pdo->lastInsertId();
+        if (isset($user['status']) && $user['status'] !== 'active') {
+            $error = "Your account is inactive. Please contact an administrator.";
+        } else {
+            $_SESSION['loggedin'] = true;
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = trim($user['first_name'] . ' ' . $user['last_name']);
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['last_activity'] = time(); // Initialize activity time
+            
+            // Log the login activity
+            $logStmt = $pdo->prepare("INSERT INTO activity_logs (user_id, login_time) VALUES (?, NOW())");
+            $logStmt->execute([$user['id']]);
+            $_SESSION['login_log_id'] = $pdo->lastInsertId();
 
-        header("Location: index.php");
-        exit;
+            header("Location: index.php");
+            exit;
+        }
     } else {
         $error = "Invalid username or password";
     }
@@ -149,6 +153,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="password" name="password" required placeholder="Password">
                 </div>
                 <button type="submit" class="login-btn">Login</button>
+                <br>
+                <br>
+                <p style="color: #64748b; font-size: 0.875rem; text-align: center;">Don't have an account? Contact Library Staff</p>
             </form>
         </div>
     </div>
