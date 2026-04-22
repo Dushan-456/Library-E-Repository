@@ -8,6 +8,24 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || !isset($_
     exit;
 }
 
+$message = '';
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+    $delete_id = $_POST['user_id'];
+    try {
+        if ($delete_id != $_SESSION['user_id']) {
+            $delStmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+            $delStmt->execute([$delete_id]);
+            $message = "User deleted successfully.";
+        } else {
+            $error = "You cannot delete your own account.";
+        }
+    } catch (PDOException $e) {
+        $error = "Database Error: " . $e->getMessage();
+    }
+}
+
 $users = [];
 $search = $_GET['search'] ?? '';
 
@@ -43,6 +61,16 @@ $activePage = 'all_users';
         .search-form button:hover { background: var(--primary-hover); }
         .btn-view { padding: 0.4rem 0.8rem; background: var(--bg-hover); color: var(--text-main); border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: background 0.2s; white-space: nowrap; }
         .btn-view:hover { background: var(--border); }
+        .btn-edit { padding: 0.4rem 0.8rem; background: #fbbf24; color: #fff; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: background 0.2s; white-space: nowrap; margin-left: 0.25rem; }
+        .btn-edit:hover { background: #f59e0b; }
+        .btn-delete { padding: 0.4rem 0.8rem; background: #ef4444; color: #fff; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s; white-space: nowrap; margin-left: 0.25rem; }
+        .btn-delete:hover { background: #dc2626; }
+        .badge { padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .badge-active { background: #dcfce7; color: #166534; }
+        .badge-inactive { background: #fee2e2; color: #991b1b; }
+        .message-box { padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; }
+        .message-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .message-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         th, td { text-align: left; padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-main); }
         th { background-color: var(--bg-main); font-weight: 600; }
@@ -107,6 +135,13 @@ $activePage = 'all_users';
                     <h1>All Registered Users</h1>
                 </div>
 
+                <?php if ($message): ?>
+                    <div class="message-box message-success"><?= htmlspecialchars($message) ?></div>
+                <?php endif; ?>
+                <?php if ($error): ?>
+                    <div class="message-box message-error"><?= htmlspecialchars($error) ?></div>
+                <?php endif; ?>
+
                 <div class="admin-card">
                     <form method="GET" action="admin_users.php" class="search-form">
                         <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Search by Email or SLMC Number...">
@@ -121,6 +156,7 @@ $activePage = 'all_users';
                                 <th>ID Number</th>
                                 <th>SLMC Number</th>
                                 <th>Role</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -134,7 +170,17 @@ $activePage = 'all_users';
                                         <td><?php echo htmlspecialchars($u['slmc_number'] ?? '-'); ?></td>
                                         <td><?php echo htmlspecialchars($u['role']); ?></td>
                                         <td>
+                                            <?php $stat = $u['status'] ?? 'active'; ?>
+                                            <span class="badge badge-<?= $stat ?>"><?= htmlspecialchars($stat) ?></span>
+                                        </td>
+                                        <td style="display: flex; gap: 0.5rem; align-items: center;">
                                             <a href="admin_user_analytics.php?id=<?= $u['id'] ?>" class="btn-view"><i class="fas fa-chart-line"></i> Analytics</a>
+                                            <a href="admin_edit_user.php?id=<?= $u['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
+                                            <form method="POST" action="admin_users.php" style="margin:0;" onsubmit="return confirm('Are you sure you want to delete this user? This cannot be undone.');">
+                                                <input type="hidden" name="action" value="delete">
+                                                <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                                <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
