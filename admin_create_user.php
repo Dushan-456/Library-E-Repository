@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/seb_check.php';
 require_once __DIR__ . '/db_config.php';
 
 // Authentication Check
@@ -7,6 +8,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || !isset($_
     header("Location: index.php");
     exit;
 }
+
+require_once __DIR__ . '/session_timeout.php';
 
 $message = "";
 $error = "";
@@ -154,16 +157,30 @@ $activePage = 'create_user';
             <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
                 <div class="theme-toggle-knob"><i class="fas fa-sun"></i></div>
             </button>
-            <div class="user-profile">
-                <i class="fas fa-user-circle"></i>
-                <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
-            </div>
+            <a href="profile.php" style="text-decoration: none; color: inherit;">
+                <div class="user-profile">
+                    <i class="fas fa-user-circle"></i>
+                    <div class="user-info-text">
+                        <span class="user-name"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                    </div>
+                </div>
+            </a>
             <a href="logout.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </header>
 
     <div class="app-container">
-        <!-- Sidebar -->
+       <!-- Global Watermark -->
+        <div class="watermark">PGIM LIBRARY
+            <br>
+            <p>
+                <span>
+                    <?php echo  htmlspecialchars($_SESSION['email']) ; ?>
+                </span>
+                <?php echo   "ID: " . htmlspecialchars($_SESSION['id_number']) . " <br> SLMC: " . htmlspecialchars($_SESSION['slmc_number']); ?>
+            </p>
+            </div> 
+    <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>PGIM Digital Library</h2>
@@ -183,7 +200,10 @@ $activePage = 'create_user';
                         <i class="fas fa-users"></i> <span>All Users</span>
                     </li>
                     <li class="<?= $activePage == 'activity' ? 'active' : '' ?>" onclick="window.location.href='admin_activity.php'">
-                        <i class="fas fa-history"></i> <span>User Activity Logs</span>
+                        <i class="fas fa-history"></i> <span>Library Analytics</span>
+                    </li>
+                    <li onclick="window.location.href='profile.php'">
+                        <i class="fas fa-id-card"></i> <span>My Profile</span>
                     </li>
                 </ul>
             </nav>
