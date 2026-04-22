@@ -1,4 +1,3 @@
-Dynamic Watermarking: Instead of the static "PGIM LIBRARY" watermark, we could overlay the authenticated user's Email or ID Number across the pages. This strongly discourages users from taking photos of the screen and sharing them.
 
 
 
@@ -7,4 +6,3 @@ Most popular books/journals.
 Peak usage times during the day.
 Active vs. Inactive user percentages.
 
-Dark Mode for Documents: Since you have a dark theme for the UI, adding a "Night Mode" for the PDF viewer (inverting the PDF colors) would make long reading sessions much easier on the eyes.
