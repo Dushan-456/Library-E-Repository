@@ -196,8 +196,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
                 </ul>
             </nav>
             <div class="sidebar-footer">
-                <p>&copy; 2026 PGIM Library -V1.0</p>
-                <p>Developed by PGIM IT Unit</p>
+                <p>&copy; 2026 PGIM Library -V1.2</p>
+                <p>Developed by PGIM IT Unit - Dushan</p>
             </div>
         </aside>
 
