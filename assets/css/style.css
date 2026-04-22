@@ -1,3 +1,5 @@
+@import url("../fonts/inter.css");
+
 :root {
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
@@ -12,7 +14,7 @@
   --border: #e2e8f0;
   --glass: rgba(255, 255, 255, 0.8);
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --watermark-color: rgba(0, 0, 0, 0.07);
+  --watermark-color: rgba(0, 0, 0, 0.1);
   --scrollbar-thumb: #cbd5e1;
 }
 
@@ -173,26 +175,34 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 1.25rem;
   border-radius: 9999px;
   background: var(--bg-hover);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
 }
 
 .user-profile:hover {
   background: var(--border);
 }
 
-.user-profile i {
-  font-size: 1.25rem;
-  color: var(--text-muted);
+.user-info-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
 }
 
-.user-profile span {
-  font-size: 0.875rem;
-  font-weight: 600;
+.user-name {
+  font-size: 0.85rem;
+  font-weight: 700;
   color: var(--text-main);
+}
+
+.user-details {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .logout-link {
@@ -452,15 +462,27 @@ justify-content: space-between;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 8rem;
+  font-size: 8.5rem;
   font-weight: 900;
   color: var(--watermark-color);
   pointer-events: none;
   z-index: 1000;
-  white-space: nowrap;
+  text-align: center;
   user-select: none;
   text-transform: uppercase;
-  letter-spacing: 1rem;
+  letter-spacing: 2rem;
+  line-height: 1;
+  opacity: 0.5;
+}
+
+.watermark p {
+  font-size: 4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5rem;
+}
+.watermark p span {
+  text-transform: lowercase;
 }
 
 .watermark-overlay {
