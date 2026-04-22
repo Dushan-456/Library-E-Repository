@@ -28,6 +28,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['loggedin'] = true;
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = trim($user['first_name'] . ' ' . $user['last_name']);
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['id_number'] = $user['id_number'];
+            $_SESSION['slmc_number'] = $user['slmc_number'] ?? 'N/A';
             $_SESSION['role'] = $user['role'];
             $_SESSION['last_activity'] = time(); // Initialize activity time
             
@@ -52,6 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>PGIM Digital Library - Login</title>
     <link rel="icon" type="image/x-icon" href="./assets/img/logo without bg.png">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
     <style>
     
         .login-card {
@@ -89,6 +93,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .form-group input:focus {
             border-color: var(--primary);
+        }
+        .password-field {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+        .password-toggle:hover {
+            color: var(--primary);
         }
         .login-btn {
             width: 100%;
@@ -150,7 +169,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" name="password" required placeholder="Password">
+                    <div class="password-field">
+                        <input type="password" name="password" id="password" required placeholder="Password">
+                        <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                    </div>
                 </div>
                 <button type="submit" class="login-btn">Login</button>
                 <br>
@@ -159,5 +181,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </form>
         </div>
     </div>
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+
+        togglePassword.addEventListener('click', function (e) {
+            // toggle the type attribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            // toggle the eye slash icon
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
 </html>
