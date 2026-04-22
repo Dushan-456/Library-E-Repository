@@ -26,11 +26,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $id_number = trim($_POST['id_number'] ?? '');
     $slmc_number = trim($_POST['slmc_number'] ?? '');
     $status = trim($_POST['status'] ?? 'active');
+    $role = trim($_POST['role'] ?? 'User');
     
     if ($first_name && $last_name && $email && $id_number) {
         try {
-            $stmt = $pdo->prepare("UPDATE users SET first_name=?, last_name=?, email=?, speciality=?, id_number=?, slmc_number=?, status=? WHERE id=?");
-            $stmt->execute([$first_name, $last_name, $email, $speciality, $id_number, $slmc_number, $status, $user_id]);
+            $stmt = $pdo->prepare("UPDATE users SET first_name=?, last_name=?, email=?, speciality=?, id_number=?, slmc_number=?, status=?, role=? WHERE id=?");
+            $stmt->execute([$first_name, $last_name, $email, $speciality, $id_number, $slmc_number, $status, $role, $user_id]);
             $message = "User details updated successfully!";
         } catch (PDOException $e) {
             if ($e->getCode() == 23000) {
@@ -187,6 +188,13 @@ $activePage = 'all_users'; // Keep the sidebar selection on "All Users" instead 
                                 <select name="status">
                                     <option value="active" <?= (isset($user['status']) && $user['status'] == 'active') ? 'selected' : '' ?>>Active</option>
                                     <option value="inactive" <?= (isset($user['status']) && $user['status'] == 'inactive') ? 'selected' : '' ?>>Inactive</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>System Role</label>
+                                <select name="role">
+                                    <option value="User" <?= (isset($user['role']) && $user['role'] == 'User') ? 'selected' : '' ?>>User</option>
+                                    <option value="Admin" <?= (isset($user['role']) && $user['role'] == 'Admin') ? 'selected' : '' ?>>Admin</option>
                                 </select>
                             </div>
                         </div>
