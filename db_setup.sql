@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     id_number VARCHAR(100) NOT NULL UNIQUE,
     slmc_number VARCHAR(100),
     role ENUM('Admin', 'User') DEFAULT 'User',
+    status ENUM('active', 'inactive') DEFAULT 'active',
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -29,7 +30,7 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 
 -- Insert initial Admin user
 -- Password is 'PgimLibrary@2026' (bcrypt hash)
-INSERT INTO users (first_name, last_name, email, speciality, id_number, slmc_number, role, password_hash)
+INSERT INTO users (first_name, last_name, email, speciality, id_number, slmc_number, role, status, password_hash)
 VALUES (
     'Admin',
     'User',
@@ -38,6 +39,7 @@ VALUES (
     'ADM001',
     'SLMC001',
     'Admin',
+    'active',
     '$2b$10$w6Xq0sXx7QzWcH9xJ6i8hOQ5yZQxG7Z9kVQ8W3H0F1g7YxYt6c9Qy'
 )
 ON DUPLICATE KEY UPDATE id_number=id_number;
