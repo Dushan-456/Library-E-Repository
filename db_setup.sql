@@ -40,6 +40,6 @@ VALUES (
     'SLMC001',
     'Admin',
     'active',
-    '$2b$10$w6Xq0sXx7QzWcH9xJ6i8hOQ5yZQxG7Z9kVQ8W3H0F1g7YxYt6c9Qy'
+    '$2y$10$cq6t80T5Ta1Ny2jKCPgQae9A6dY7IulurSWawVdRjVh0ZxrA6egcq'
 )
 ON DUPLICATE KEY UPDATE id_number=id_number;
