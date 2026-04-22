@@ -141,6 +141,8 @@ $activePage = 'create_user';
         .sidebar-nav li { padding: 0.875rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s; color: var(--text-muted); font-weight: 500;}
         .sidebar-nav li:hover { background-color: var(--bg-hover); color: var(--primary); }
         .sidebar-nav li.active { background-color: var(--bg-active); color: var(--primary); border-right: 3px solid var(--primary); }
+        .btn-download-sample { display: inline-block; margin-top: 0.75rem; padding: 0.5rem 1rem; background: var(--bg-hover); color: var(--text-main); text-decoration: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; border: 1px solid var(--border); transition: all 0.2s; }
+        .btn-download-sample:hover { background: var(--border); }
     </style>
 </head>
 <body>
@@ -257,6 +259,10 @@ $activePage = 'create_user';
                                 <li>Column 6: SLMC Number</li>
                             </ul>
                             <em>Note: The first row will be skipped if it contains headers. Password defaults to ID Number.</em>
+                            <br>
+                            <a href="sample_users.csv" download="sample_users.csv" class="btn-download-sample">
+                                <i class="fas fa-download"></i> Download Sample CSV
+                            </a>
                         </div>
                         <form method="POST" action="admin_create_user.php" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="upload_csv">
