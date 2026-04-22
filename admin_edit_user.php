@@ -17,7 +17,6 @@ if (!$user_id) {
     exit;
 }
 
-// Handle Update
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'edit_user') {
     $first_name = trim($_POST['first_name'] ?? '');
     $last_name = trim($_POST['last_name'] ?? '');
@@ -27,17 +26,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $slmc_number = trim($_POST['slmc_number'] ?? '');
     $status = trim($_POST['status'] ?? 'active');
     $role = trim($_POST['role'] ?? 'User');
+    $new_password = $_POST['new_password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
     
     if ($first_name && $last_name && $email && $id_number) {
-        try {
-            $stmt = $pdo->prepare("UPDATE users SET first_name=?, last_name=?, email=?, speciality=?, id_number=?, slmc_number=?, status=?, role=? WHERE id=?");
-            $stmt->execute([$first_name, $last_name, $email, $speciality, $id_number, $slmc_number, $status, $role, $user_id]);
-            $message = "User details updated successfully!";
-        } catch (PDOException $e) {
-            if ($e->getCode() == 23000) {
-                $error = "Error: Email or ID Number already exists for another user.";
-            } else {
-                $error = "Database Error: " . $e->getMessage();
+        if (!empty($new_password) && $new_password !== $confirm_password) {
+            $error = "Passwords do not match!";
+        } else {
+            try {
+                $sql = "UPDATE users SET first_name=?, last_name=?, email=?, speciality=?, id_number=?, slmc_number=?, status=?, role=?";
+                $params = [$first_name, $last_name, $email, $speciality, $id_number, $slmc_number, $status, $role];
+                
+                if (!empty($new_password)) {
+                    $sql .= ", password_hash=?";
+                    $params[] = password_hash($new_password, PASSWORD_DEFAULT);
+                }
+                
+                $sql .= " WHERE id=?";
+                $params[] = $user_id;
+
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($params);
+                $message = "User details updated successfully!";
+                if (!empty($new_password)) {
+                    $message .= " Password has been changed.";
+                }
+            } catch (PDOException $e) {
+                if ($e->getCode() == 23000) {
+                    $error = "Error: Email or ID Number already exists for another user.";
+                } else {
+                    $error = "Database Error: " . $e->getMessage();
+                }
             }
         }
     } else {
@@ -196,6 +215,20 @@ $activePage = 'all_users'; // Keep the sidebar selection on "All Users" instead 
                                     <option value="User" <?= (isset($user['role']) && $user['role'] == 'User') ? 'selected' : '' ?>>User</option>
                                     <option value="Admin" <?= (isset($user['role']) && $user['role'] == 'Admin') ? 'selected' : '' ?>>Admin</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <div class="admin-header" style="margin-top: 2rem;">
+                            <h2><i class="fas fa-key"></i> Change Password (Leave blank to keep current)</h2>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" name="new_password" placeholder="Enter new password">
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm New Password</label>
+                                <input type="password" name="confirm_password" placeholder="Confirm new password">
                             </div>
                         </div>
                         <div style="margin-top: 1.5rem;">
