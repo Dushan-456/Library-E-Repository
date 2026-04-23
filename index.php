@@ -174,10 +174,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
                     <li class="active" data-folder="">
                         <i class="fas fa-home"></i> <span>Home</span>
                     </li>
-                    <li data-folder="E Books & Jounals/Books">
-                        <i class="fas fa-book"></i> <span>Books</span>
+                    <li data-folder="Books">
+                        <i class="fas fa-book"></i> <span>E Books</span>
                     </li>
-                    <li data-folder="E Books & Jounals/Journals">
+                    <li data-folder="Jounals">
                         <i class="fas fa-journal-whills"></i> <span>Journals</span>
                     </li>
                     <li data-folder="PGIM Academic Publication">
