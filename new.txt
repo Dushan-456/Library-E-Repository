@@ -1,8 +1,0 @@
-
-
-
-Visual Analytics Dashboard: Transform the "Activity Logs" into a visual dashboard using charts (e.g., Chart.js). This could show:
-Most popular books/journals.
-Peak usage times during the day.
-Active vs. Inactive user percentages.
-
