@@ -1,8 +1,9 @@
 <?php
 // Define the mapping of virtual folders to physical drives/folders
 $LIBRARY_MAPPINGS = [
-    'E Books & Jounals' => 'D:\E Books & Jounals',
-    'PGIM Academic Publication' => 'E:\PGIM Academic Publication',
+    'Jounals' => 'D:\E - Jounals',
+    'Books' => 'E:\Books',
+    'PGIM Academic Publication' => 'F:\PGIM Academic Publication',
     'DEFAULT' => __DIR__ . DIRECTORY_SEPARATOR . 'E Resources'
 ];
 
