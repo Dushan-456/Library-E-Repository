@@ -177,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <button type="submit" class="login-btn">Login</button>
                 <br>
                 <br>
-                <p style="color: #64748b; font-size: 0.875rem; text-align: center;">Don't have an account? Contact Library Staff</p>
+                <p style="color: #64748b; font-size: 0.875rem; text-align: center;">Don't have an account? <a href="register.php" style="color: var(--primary); text-decoration: none; font-weight: 600;">Register Now</a></p>
             </form>
         </div>
     </div>
