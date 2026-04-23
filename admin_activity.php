@@ -100,11 +100,11 @@ $activePage = 'activity';
         }
         .chart-container { 
             background: var(--bg-card); 
-            padding: 1.5rem; 
+            padding: 2.5rem; 
             border-radius: 12px; 
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
             border: 1px solid var(--border);
-            height: 280px;
+            height: 380px;
             overflow: hidden; /* Prevent overflow of internal elements */
         }
         .chart-container.full-width {
@@ -212,8 +212,8 @@ $activePage = 'activity';
                 </ul>
             </nav>
             <div class="sidebar-footer">
-                <p>&copy; 2026 PGIM Library -V1.0</p>
-                <p>Developed by PGIM IT Unit</p>
+                <p>&copy; 2026 PGIM Library -V1.2</p>
+                <p>Developed by PGIM IT Unit - Dushan</p>
             </div>
         </aside>
 
