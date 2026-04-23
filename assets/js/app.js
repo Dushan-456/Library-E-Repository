@@ -121,12 +121,12 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="welcome-slider-container">
                 <div class="welcome-slider">
-                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'E Books & Jounals/Books\\']').click()">
+                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'Books\\']').click()">
                         <i class="fas fa-book"></i>
                         <h3>Books</h3>
                         <p>Access thousands of medical texts</p>
                     </div>
-                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'E Books & Jounals/Journals\\']').click()">
+                    <div class="welcome-slide" onclick="document.querySelector('[data-folder=\\'Jounals\\']').click()">
                         <i class="fas fa-address-card"></i>
                         <h3>Journals</h3>
                         <p>Stay updated with latest research</p>
