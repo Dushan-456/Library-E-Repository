@@ -14,7 +14,7 @@
   --border: #e2e8f0;
   --glass: rgba(255, 255, 255, 0.8);
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --watermark-color: rgba(0, 0, 0, 0.1);
+  --watermark-color: rgba(0, 0, 0, 0.2);
   --scrollbar-thumb: #cbd5e1;
 }
 
@@ -33,7 +33,7 @@
   --border: #334155;
   --glass: rgba(15, 23, 42, 0.85);
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
-  --watermark-color: rgba(255, 255, 255, 0.1);
+  --watermark-color: rgba(255, 255, 255, 0.2);
   --scrollbar-thumb: #475569;
 }
 
