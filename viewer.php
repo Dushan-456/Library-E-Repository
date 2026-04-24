@@ -274,8 +274,8 @@ try {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-40deg);
-            font-size: 6.5rem;
-            color: rgba(0,0,0,0.12);
+            font-size: 5rem;
+            color: rgba(0,0,0,0.2);
             font-weight: 800;
             pointer-events: none;
             user-select: none;
