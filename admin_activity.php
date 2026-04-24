@@ -206,6 +206,9 @@ $activePage = 'activity';
                     <li class="<?= $activePage == 'activity' ? 'active' : '' ?>" onclick="window.location.href='admin_activity.php'">
                         <i class="fas fa-history"></i> <span>Library Analytics</span>
                     </li>
+                    <li class="<?= $activePage == 'reindex' ? 'active' : '' ?>" onclick="window.location.href='admin_reindex.php'">
+                        <i class="fas fa-database"></i> <span>Search Index</span>
+                    </li>
                     <li onclick="window.location.href='profile.php'">
                         <i class="fas fa-id-card"></i> <span>My Profile</span>
                     </li>
@@ -306,6 +309,7 @@ $activePage = 'activity';
         // Data from PHP
         const popularLabels = <?php echo json_encode(array_map(function($item) { return basename($item['file_path']); }, $popularData)); ?>;
         const popularValues = <?php echo json_encode(array_column($popularData, 'access_count')); ?>;
+        const popularPaths = <?php echo json_encode(array_column($popularData, 'file_path')); ?>;
         
         const hourlyLabels = <?php echo json_encode(range(0, 23)); ?>.map(h => h + ":00");
         const hourlyValues = <?php echo json_encode($hourlyData); ?>;
@@ -341,11 +345,27 @@ $activePage = 'activity';
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        window.open('viewer.php?file=' + encodeURIComponent(popularPaths[index]), '_blank');
+                    }
+                },
+                onHover: (event, elements) => {
+                    event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                },
                 scales: {
                     y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
                     x: { grid: { display: false } }
                 },
-                plugins: { legend: { display: false } }
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: () => '(Click to open)'
+                        }
+                    }
+                }
             }
         });
 
