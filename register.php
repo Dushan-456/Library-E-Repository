@@ -109,7 +109,7 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
             </div>
             
             <div class="qr-container">
-                <img class="qr-image" src="./assets/img/qr.png" alt="Registration QR Code">
+                <img class="qr-image" src="./assets/img/new-qr.png" alt="Registration QR Code">
             </div>
             
             <div class="instructions">
