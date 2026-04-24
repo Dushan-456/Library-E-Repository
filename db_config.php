@@ -1,7 +1,7 @@
 <?php
 // db_config.php
 
-$host = 'localhost';
+$host = 'localhost:3307';
 $dbname = 'pgim_library';
 $username = 'root';
 $password = ''; // Default XAMPP password is empty
