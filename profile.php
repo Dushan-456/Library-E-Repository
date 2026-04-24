@@ -252,6 +252,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <li onclick="window.location.href='admin_activity.php'">
                         <i class="fas fa-history"></i> <span>Library Analytics</span>
                     </li>
+                    <li onclick="window.location.href='admin_reindex.php'">
+                        <i class="fas fa-database"></i> <span>Search Index</span>
+                    </li>
                     <?php endif; ?>
                     <li class="active" onclick="window.location.href='profile.php'">
                         <i class="fas fa-id-card"></i> <span>My Profile</span>
