@@ -37,6 +37,18 @@ CREATE TABLE IF NOT EXISTS document_access_logs (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Table for File Index (Pre-indexed file paths for fast search)
+CREATE TABLE IF NOT EXISTS file_index (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_name VARCHAR(500) NOT NULL,
+    virtual_path VARCHAR(1000) NOT NULL,
+    is_dir TINYINT(1) DEFAULT 0,
+    file_size BIGINT DEFAULT 0,
+    indexed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_filename (file_name),
+    FULLTEXT INDEX idx_fulltext (file_name, virtual_path)
+) ENGINE=InnoDB;
+
 -- Insert initial Admin user
 -- Password is 'PgimLibrary@2026' (bcrypt hash)
 INSERT INTO users (first_name, last_name, email, speciality, id_number, slmc_number, role, status, password_hash)
