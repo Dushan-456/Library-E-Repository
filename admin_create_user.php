@@ -202,6 +202,9 @@ $activePage = 'create_user';
                     <li class="<?= $activePage == 'activity' ? 'active' : '' ?>" onclick="window.location.href='admin_activity.php'">
                         <i class="fas fa-history"></i> <span>Library Analytics</span>
                     </li>
+                    <li class="<?= $activePage == 'reindex' ? 'active' : '' ?>" onclick="window.location.href='admin_reindex.php'">
+                        <i class="fas fa-database"></i> <span>Search Index</span>
+                    </li>
                     <li onclick="window.location.href='profile.php'">
                         <i class="fas fa-id-card"></i> <span>My Profile</span>
                     </li>
