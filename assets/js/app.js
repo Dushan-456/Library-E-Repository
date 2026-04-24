@@ -203,25 +203,47 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   });
 
-  // Search functionality
-  let searchTimeout;
-  searchInput.oninput = () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(async () => {
-      const query = searchInput.value.trim();
-      if (query.length < 2) {
-        if (query.length === 0) loadFolder(currentPath);
-        return;
-      }
+  // Search functionality — trigger on Enter key or Search button click only
+  const searchBtn = document.getElementById("searchBtn");
 
-      fileGrid.innerHTML = '<div class="loader"><i class="fas fa-circle-notch fa-spin"></i>Searching the library...</div>';
+  async function executeSearch() {
+    const query = searchInput.value.trim();
+    if (query.length < 2) {
+      if (query.length === 0) loadFolder(currentPath);
+      return;
+    }
+
+    fileGrid.innerHTML = '<div class="loader"><i class="fas fa-circle-notch fa-spin"></i>Searching the library...</div>';
+    try {
       const response = await fetch(
         `index.php?action=search&query=${encodeURIComponent(query)}`,
       );
       const data = await response.json();
-      renderFiles(data, true); // Pass true to indicate this is a search result
-    }, 500);
-  };
+      renderFiles(data, true);
+    } catch (error) {
+      fileGrid.innerHTML = '<div class="loader">Error searching. Please try again.</div>';
+    }
+  }
+
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      executeSearch();
+    }
+    // Clear search when input is emptied via Backspace/Delete
+    if (searchInput.value.trim() === "" && (e.key === "Backspace" || e.key === "Delete")) {
+      setTimeout(() => {
+        if (searchInput.value.trim() === "") loadFolder(currentPath);
+      }, 50);
+    }
+  });
+
+  if (searchBtn) {
+    searchBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      executeSearch();
+    });
+  }
 
   // View Switching Logic
   const gridViewBtn = document.getElementById("gridViewBtn");
