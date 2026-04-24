@@ -162,6 +162,9 @@ function formatDuration($seconds) {
                     <li class="<?= $activePage == 'activity' ? 'active' : '' ?>" onclick="window.location.href='admin_activity.php'">
                         <i class="fas fa-history"></i> <span>Library Analytics</span>
                     </li>
+                    <li class="<?= $activePage == 'reindex' ? 'active' : '' ?>" onclick="window.location.href='admin_reindex.php'">
+                        <i class="fas fa-database"></i> <span>Search Index</span>
+                    </li>
                     <li onclick="window.location.href='profile.php'">
                         <i class="fas fa-id-card"></i> <span>My Profile</span>
                     </li>
@@ -246,6 +249,7 @@ function formatDuration($seconds) {
         // Data from PHP
         const userPopularLabels = <?php echo json_encode(array_map(function($item) { return basename($item['file_path']); }, $mostViewed)); ?>;
         const userPopularValues = <?php echo json_encode(array_column($mostViewed, 'view_count')); ?>;
+        const userPopularPaths = <?php echo json_encode(array_column($mostViewed, 'file_path')); ?>;
 
         // Theme-aware Chart Config
         Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim() || '#334155';
@@ -268,6 +272,15 @@ function formatDuration($seconds) {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            window.open('viewer.php?file=' + encodeURIComponent(userPopularPaths[index]), '_blank');
+                        }
+                    },
+                    onHover: (event, elements) => {
+                        event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                    },
                     scales: {
                         y: { 
                             beginAtZero: true, 
@@ -277,7 +290,12 @@ function formatDuration($seconds) {
                         x: { grid: { display: false } }
                     },
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: () => '(Click to open)'
+                            }
+                        }
                     }
                 }
             });
