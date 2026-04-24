@@ -69,41 +69,36 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_folder') {
     exit;
 }
 
-// Handle AJAX request for searching
+// Handle AJAX request for searching (uses pre-built file_index table)
 if (isset($_GET['action']) && $_GET['action'] === 'search') {
     header('Content-Type: application/json');
-    $query = strtolower($_GET['query']);
+    require_once __DIR__ . '/db_config.php';
+    $query = trim($_GET['query'] ?? '');
     $results = [];
-    
-    global $LIBRARY_MAPPINGS;
-    foreach ($LIBRARY_MAPPINGS as $rootName => $physicalBase) {
-        $realBase = realpath($physicalBase);
-        if (!$realBase || !is_dir($realBase)) continue;
-        
+
+    if (strlen($query) >= 2) {
         try {
-            $it = new RecursiveDirectoryIterator($realBase, RecursiveDirectoryIterator::SKIP_DOTS);
-            foreach (new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST) as $file) {
-                $filename = $file->getFilename();
-                if (strpos(strtolower($filename), $query) !== false) {
-                    $fullPath = $file->getRealPath();
-                    $relPath = str_replace($realBase . DIRECTORY_SEPARATOR, '', $fullPath);
-                    $relPath = str_replace(DIRECTORY_SEPARATOR, '/', $relPath);
-                    
-                    $virtualPath = ($rootName === 'DEFAULT') ? $relPath : $rootName . '/' . $relPath;
-                    
-                    $results[] = [
-                        'name' => $filename,
-                        'path' => $virtualPath,
-                        'isDir' => $file->isDir(),
-                        'size' => $file->isFile() ? $file->getSize() : 0
-                    ];
-                    if (count($results) > 100) break 2; // Increased limit
-                }
+            // Search only by file/folder name (not parent path)
+            $stmt = $pdo->prepare("
+                SELECT file_name AS name, virtual_path AS path, is_dir AS isDir, file_size AS size
+                FROM file_index
+                WHERE file_name LIKE ?
+                ORDER BY is_dir DESC, file_name ASC
+                LIMIT 100
+            ");
+            $stmt->execute(["%{$query}%"]);
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Cast types for JSON consistency
+            foreach ($results as &$r) {
+                $r['isDir'] = (bool)$r['isDir'];
+                $r['size'] = (int)$r['size'];
             }
-        } catch (Exception $e) {
-            // Ignore unreadable directories
+        } catch (PDOException $e) {
+            // Return empty results on DB error
         }
     }
+
     echo json_encode($results);
     exit;
 }
@@ -132,8 +127,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
             
         </div>
           <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search resources...">
+                    <input type="text" id="searchInput" placeholder="Search resources... (Press Enter)">
+                    <button id="searchBtn" class="search-btn" title="Search"><i class="fas fa-search"></i></button>
                 </div>
         <div class="header-right">
             <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
@@ -198,6 +193,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
                         </li>
                         <li onclick="window.location.href='admin_activity.php'">
                             <i class="fas fa-history"></i> <span>Library Analytics</span>
+                        </li>
+                        <li onclick="window.location.href='admin_reindex.php'">
+                            <i class="fas fa-database"></i> <span>Search Index</span>
                         </li>
                     <?php endif; ?>
                 </ul>
