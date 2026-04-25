@@ -62,7 +62,7 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
             gap: 20px;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            height: calc(100vh / var(--app-zoom, 1));
         }
         .logo {
             width: 130px;
