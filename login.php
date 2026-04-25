@@ -139,7 +139,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             gap: 20px;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            height: calc(100vh / var(--app-zoom, 1));
         }
         .logo{
             width: 130px;
