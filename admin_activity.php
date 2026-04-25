@@ -150,6 +150,40 @@ $activePage = 'activity';
             color: white;
             border-color: var(--primary);
         }
+        
+        @media print {
+            .sidebar, .main-header, .toggle-container, .watermark {
+                display: none !important;
+            }
+            .app-container {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .main-content {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .dashboard-grid {
+                display: block !important;
+            }
+            .chart-container {
+                page-break-inside: avoid;
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                margin-bottom: 2rem !important;
+                height: auto !important;
+                width: 100% !important;
+            }
+            .chart-scroll-wrapper {
+                overflow: visible !important;
+            }
+            .chart-inner-container {
+                width: 100% !important;
+            }
+            body {
+                background: white !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -158,6 +192,11 @@ $activePage = 'activity';
             <img src="./assets/img/pgim booking.png" alt="PGIM Logo">
         </div>
         <div class="header-right">
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                <button id="sebToggleBtn" data-enabled="<?php echo $safe_browser_only ? 'true' : 'false'; ?>" style="padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; border: none; margin-right: 15px; background: <?php echo $safe_browser_only ? '#10b981' : '#ef4444'; ?>; color: white; transition: background 0.2s;">
+                    <?php echo $safe_browser_only ? 'SEB OFF' : 'SEB ON'; ?>
+                </button>
+            <?php endif; ?>
             <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
                 <div class="theme-toggle-knob"><i class="fas fa-sun"></i></div>
             </button>
@@ -227,13 +266,23 @@ $activePage = 'activity';
                     <h1>User Activity & Analytics</h1>
                 </div>
 
-                <div class="toggle-container">
-                    <button class="view-toggle active" id="showAnalytics">
-                        <i class="fas fa-chart-pie"></i> Analytics Dashboard
-                    </button>
-                    <button class="view-toggle" id="showLogs">
-                        <i class="fas fa-list"></i> Activity Logs
-                    </button>
+                <div class="toggle-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="view-toggle active" id="showAnalytics">
+                            <i class="fas fa-chart-pie"></i> Analytics Dashboard
+                        </button>
+                        <button class="view-toggle" id="showLogs">
+                            <i class="fas fa-list"></i> Activity Logs
+                        </button>
+                    </div>
+                    <div>
+                        <button class="view-toggle" id="exportAnalyticsBtn" style="background: #10b981; color: white; border: none; font-weight: bold; padding: 0.6rem 1.2rem; cursor: pointer;" onclick="window.print()">
+                            <i class="fas fa-file-pdf"></i> Export Analytics
+                        </button>
+                        <button class="view-toggle" id="exportLogsBtn" style="display: none; background: #10b981; color: white; border: none; font-weight: bold; padding: 0.6rem 1.2rem; cursor: pointer;" onclick="window.location.href='export_activity_logs.php'">
+                            <i class="fas fa-file-csv"></i> Export Logs to CSV
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Analytics Dashboard -->
@@ -248,7 +297,7 @@ $activePage = 'activity';
                             </div>
                         </div>
                         <div class="chart-container">
-                            <h3><i class="fas fa-clock"></i> Peak Usage Times (24h)</h3>
+                            <h3><i class="fas fa-clock"></i> Peak Usage Times (last 30 days)</h3>
                             <canvas id="usageChart"></canvas>
                         </div>
                         <div class="chart-container">
@@ -433,6 +482,8 @@ $activePage = 'activity';
             document.getElementById('showLogs').classList.remove('active');
             document.getElementById('analyticsView').style.display = 'block';
             document.getElementById('logsView').style.display = 'none';
+            document.getElementById('exportAnalyticsBtn').style.display = 'block';
+            document.getElementById('exportLogsBtn').style.display = 'none';
         });
 
         document.getElementById('showLogs').addEventListener('click', function() {
@@ -440,6 +491,8 @@ $activePage = 'activity';
             document.getElementById('showAnalytics').classList.remove('active');
             document.getElementById('logsView').style.display = 'block';
             document.getElementById('analyticsView').style.display = 'none';
+            document.getElementById('exportAnalyticsBtn').style.display = 'none';
+            document.getElementById('exportLogsBtn').style.display = 'block';
         });
     </script>
 </body>
