@@ -1,7 +1,21 @@
 <?php
-// Set to true to ONLY allow access via Safe Exam Browser (SEB)
-// Set to false to allow any browser
-$safe_browser_only = false;
+require_once __DIR__ . '/db_config.php';
+
+// Ensure settings table exists
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS settings (
+        setting_key VARCHAR(50) PRIMARY KEY,
+        setting_value VARCHAR(255) NOT NULL
+    )");
+    $pdo->exec("INSERT IGNORE INTO settings (setting_key, setting_value) VALUES ('safe_browser_only', '0')");
+} catch (PDOException $e) {
+    // Ignore error
+}
+
+$stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'safe_browser_only'");
+$stmt->execute();
+$val = $stmt->fetchColumn();
+$safe_browser_only = ($val === '1' || $val === 'true');
 
 if ($safe_browser_only) {
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
