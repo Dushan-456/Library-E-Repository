@@ -78,15 +78,16 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
 
     if (strlen($query) >= 2) {
         try {
-            // Search only by file/folder name (not parent path)
+            // Search by file/folder name and virtual path, restrict to folders and PDFs
             $stmt = $pdo->prepare("
                 SELECT file_name AS name, virtual_path AS path, is_dir AS isDir, file_size AS size
                 FROM file_index
-                WHERE file_name LIKE ?
+                WHERE (file_name LIKE ? OR virtual_path LIKE ?)
+                  AND (is_dir = 1 OR file_name LIKE '%.pdf')
                 ORDER BY is_dir DESC, file_name ASC
                 LIMIT 100
             ");
-            $stmt->execute(["%{$query}%"]);
+            $stmt->execute(["%{$query}%", "%{$query}%"]);
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Cast types for JSON consistency
@@ -131,6 +132,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
                     <button id="searchBtn" class="search-btn" title="Search"><i class="fas fa-search"></i></button>
                 </div>
         <div class="header-right">
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                <button id="sebToggleBtn" data-enabled="<?php echo $safe_browser_only ? 'true' : 'false'; ?>" style="padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; border: none; margin-right: 15px; background: <?php echo $safe_browser_only ? '#10b981' : '#ef4444'; ?>; color: white; transition: background 0.2s;">
+                    <?php echo $safe_browser_only ? 'SEB OFF' : 'SEB ON'; ?>
+                </button>
+            <?php endif; ?>
             <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
                 <div class="theme-toggle-knob"><i class="fas fa-sun"></i></div>
             </button>
