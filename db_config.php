@@ -1,7 +1,7 @@
 <?php
 // db_config.php
 
-$host = 'localhost:3307';
+$host = 'localhost:3306';
 $dbname = 'pgim_library';
 $username = 'root';
 $password = ''; // Default XAMPP password is empty
@@ -16,3 +16,4 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 ?>
+
