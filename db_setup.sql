@@ -37,6 +37,13 @@ CREATE TABLE IF NOT EXISTS document_access_logs (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Table for Global Settings
+CREATE TABLE IF NOT EXISTS settings (
+    setting_key VARCHAR(50) PRIMARY KEY,
+    setting_value VARCHAR(255) NOT NULL
+);
+INSERT IGNORE INTO settings (setting_key, setting_value) VALUES ('safe_browser_only', '0');
+
 -- Table for File Index (Pre-indexed file paths for fast search)
 CREATE TABLE IF NOT EXISTS file_index (
     id INT AUTO_INCREMENT PRIMARY KEY,
