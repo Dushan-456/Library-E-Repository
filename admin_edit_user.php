@@ -117,6 +117,11 @@ $activePage = 'all_users'; // Keep the sidebar selection on "All Users" instead 
             <img src="./assets/img/pgim logo black.png" alt="PGIM Logo">
         </div>
         <div class="header-right">
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                <button id="sebToggleBtn" data-enabled="<?php echo $safe_browser_only ? 'true' : 'false'; ?>" style="padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; border: none; margin-right: 15px; background: <?php echo $safe_browser_only ? '#10b981' : '#ef4444'; ?>; color: white; transition: background 0.2s;">
+                    <?php echo $safe_browser_only ? 'SEB OFF' : 'SEB ON'; ?>
+                </button>
+            <?php endif; ?>
             <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
                 <div class="theme-toggle-knob"><i class="fas fa-sun"></i></div>
             </button>
