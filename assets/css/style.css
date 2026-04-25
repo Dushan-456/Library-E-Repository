@@ -1,6 +1,9 @@
 @import url("../fonts/inter.css");
 
 :root {
+  /* Global App Zoom Level (use decimal like 0.8 for 80%, 0.6 for 60%) */
+  --app-zoom: 0.9;
+  
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
   --bg-main: #f8fafc;
@@ -123,11 +126,14 @@ body {
   color: var(--text-main);
   overflow: hidden;
   width: 100%;
+  
+  /* Applies the global zoom level to scale down the entire web app */
+  zoom: var(--app-zoom);
 }
 
 .app-container {
   display: flex;
-  height: calc(100vh - 64px);
+  height: calc((100vh / var(--app-zoom)) - 64px);
 }
 
 /* Global Top Header */
