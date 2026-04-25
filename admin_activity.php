@@ -152,36 +152,55 @@ $activePage = 'activity';
         }
         
         @media print {
+            @page {
+                size: A4 landscape;
+                margin: 1cm;
+            }
             .sidebar, .main-header, .toggle-container, .watermark {
                 display: none !important;
             }
             .app-container {
                 margin: 0 !important;
                 padding: 0 !important;
+                width: 100% !important;
             }
             .main-content {
                 margin: 0 !important;
                 padding: 0 !important;
+                width: 100% !important;
             }
             .dashboard-grid {
                 display: block !important;
+                width: 100% !important;
             }
             .chart-container {
                 page-break-inside: avoid;
                 box-shadow: none !important;
                 border: 1px solid #ccc !important;
                 margin-bottom: 2rem !important;
-                height: auto !important;
+                height: 400px !important;
                 width: 100% !important;
+                position: relative !important;
+            }
+            .chart-container.full-width {
+                height: 500px !important;
             }
             .chart-scroll-wrapper {
                 overflow: visible !important;
+                height: calc(100% - 40px) !important;
             }
             .chart-inner-container {
                 width: 100% !important;
+                height: 100% !important;
             }
             body {
                 background: white !important;
+                color: black !important;
+            }
+            /* Force chart rendering */
+            canvas {
+                min-height: 100% !important;
+                max-width: 100% !important;
             }
         }
     </style>
