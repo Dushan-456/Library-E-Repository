@@ -153,7 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <img class="logo" src="./assets/img/logo without bg.png" alt="PGIM Logo">
         <div class="login-card">
             <div class="login-header">
-                <h2>PGIM E-Library</h2>
+                <h2>PGIM Digital Library</h2>
                 <p style="color: #64748b; font-size: 0.875rem;">Please login to access the library Resources</p>
             </div>
             <?php if ($error): ?>
