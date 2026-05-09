@@ -79,14 +79,19 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
     if (strlen($query) >= 2) {
         try {
             // Search by file/folder name and virtual path, restrict to folders and PDFs
+            // Create a version of the query with no spaces
+            $queryNoSpaces = str_replace(' ', '', $query);
+
+            // Search by regular name/path OR by space-stripped name/path
             $stmt = $pdo->prepare("
                 SELECT file_name AS name, virtual_path AS path, is_dir AS isDir, file_size AS size
                 FROM file_index
                 WHERE (file_name LIKE ? OR virtual_path LIKE ?)
+                   OR (REPLACE(file_name, ' ', '') LIKE ? OR REPLACE(virtual_path, ' ', '') LIKE ?)
                 ORDER BY is_dir DESC, file_name ASC
                 LIMIT 100
             ");
-            $stmt->execute(["%{$query}%", "%{$query}%"]);
+            $stmt->execute(["%{$query}%", "%{$query}%", "%{$queryNoSpaces}%", "%{$queryNoSpaces}%"]);
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Cast types for JSON consistency
