@@ -1,21 +1,29 @@
 <?php
 require 'db_config.php';
-
-$stmt = $pdo->prepare("
-    SELECT 
-        SUBSTRING_INDEX(virtual_path, '/', 1) as root_folder, 
-        COUNT(*) as total_files 
-    FROM file_index 
-    GROUP BY root_folder
-");
-$stmt->execute();
-$counts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+require 'path_config.php';
 
 echo "<pre>";
-echo "<h3>Total Indexed Files IN THE DATABASE per Root Folder:</h3>\n";
-print_r($counts);
-echo "</pre>";
+echo "Starting mini-index test for Books...\n";
+
+$physicalBase = $LIBRARY_MAPPINGS['Books'];
+$realBase = realpath($physicalBase);
+
+if (!$realBase || !is_dir($realBase)) {
+    die("Books path not found or not a directory\n");
+}
+
+try {
+    $dirIt = new RecursiveDirectoryIterator($realBase, RecursiveDirectoryIterator::SKIP_DOTS);
+    $it = new RecursiveIteratorIterator($dirIt, RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD);
+    
+    $count = 0;
+    foreach ($it as $file) {
+        $count++;
+        if ($count > 100) break; // Just check if it can read the first 100 files
+    }
+    echo "SUCCESS! Was able to read the first $count files from Books without crashing using the exact method the indexer uses.\n";
+} catch (Exception $e) {
+    echo "CRASHED! Error: " . $e->getMessage() . "\n";
+}
+echo "Done.</pre>";
 ?>
-
-
-<!-- http://localhost/Library-E-Repository/test_db.php -->
