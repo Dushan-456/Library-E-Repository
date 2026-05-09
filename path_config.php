@@ -4,7 +4,7 @@ $LIBRARY_MAPPINGS = [
     'Jounals' => 'D:\E - Jounals',
     'Books' => 'E:\Books',
     'PGIM Academic Publication' => 'F:\PGIM Academic Publication',
-    'DEFAULT' => __DIR__ . DIRECTORY_SEPARATOR . 'E Resources'
+    'DEFAULT' => __DIR__ . DIRECTORY_SEPARATOR . 'E - Jounals'
 ];
 
 /**
