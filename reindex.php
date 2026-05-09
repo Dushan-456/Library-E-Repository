@@ -97,29 +97,40 @@ if ($action === 'run') {
             if (!$realBase || !is_dir($realBase)) continue;
 
             try {
-                $it = new RecursiveDirectoryIterator($realBase, RecursiveDirectoryIterator::SKIP_DOTS);
-                foreach (new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST) as $file) {
-                    $filename = $file->getFilename();
-                    $fullPath = $file->getRealPath();
-                    $relPath = str_replace($realBase . DIRECTORY_SEPARATOR, '', $fullPath);
-                    $relPath = str_replace(DIRECTORY_SEPARATOR, '/', $relPath);
+                $dirIt = new RecursiveDirectoryIterator($realBase, RecursiveDirectoryIterator::SKIP_DOTS);
+                $it = new RecursiveIteratorIterator($dirIt, RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD);
+                
+                foreach ($it as $file) {
+                    try {
+                        $filename = $file->getFilename();
+                        $fullPath = $file->getRealPath();
+                        
+                        // If path couldn't be resolved (e.g. permissions), skip this specific item
+                        if ($fullPath === false) continue;
+                        
+                        $relPath = str_replace($realBase . DIRECTORY_SEPARATOR, '', $fullPath);
+                        $relPath = str_replace(DIRECTORY_SEPARATOR, '/', $relPath);
 
-                    $virtualPath = ($rootName === 'DEFAULT') ? $relPath : $rootName . '/' . $relPath;
-                    $isDir = $file->isDir() ? 1 : 0;
-                    $fileSize = $file->isFile() ? $file->getSize() : 0;
+                        $virtualPath = ($rootName === 'DEFAULT') ? $relPath : $rootName . '/' . $relPath;
+                        $isDir = $file->isDir() ? 1 : 0;
+                        $fileSize = $file->isFile() ? $file->getSize() : 0;
 
-                    $batch[] = [$filename, $virtualPath, $isDir, $fileSize];
-                    $count++;
+                        $batch[] = [$filename, $virtualPath, $isDir, $fileSize];
+                        $count++;
 
-                    if (count($batch) >= $batchSize) {
-                        foreach ($batch as $row) {
-                            $insertStmt->execute($row);
+                        if (count($batch) >= $batchSize) {
+                            foreach ($batch as $row) {
+                                $insertStmt->execute($row);
+                            }
+                            $batch = [];
                         }
-                        $batch = [];
+                    } catch (Exception $e) {
+                        // Skip individual problematic files
+                        continue;
                     }
                 }
             } catch (Exception $e) {
-                // Skip unreadable directories
+                // Skip if the root directory itself is completely unreadable
             }
         }
 
