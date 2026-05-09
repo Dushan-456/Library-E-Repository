@@ -1,38 +1,19 @@
 <?php
-require 'path_config.php';
+require 'db_config.php';
 
-$results = [];
-foreach ($LIBRARY_MAPPINGS as $name => $path) {
-    $real = realpath($path);
-    $canRead = false;
-    $error = '';
-    
-    if ($real && is_dir($real)) {
-        try {
-            $files = @scandir($real);
-            if ($files !== false) {
-                $canRead = true;
-                $error = count($files) . ' files/folders found';
-            } else {
-                $error = 'scandir() returned false (Permission Denied)';
-            }
-        } catch (Exception $e) {
-            $error = $e->getMessage();
-        }
-    } else {
-        $error = 'Not a valid directory';
-    }
-
-    $results[$name] = [
-        'path' => $path,
-        'can_read' => $canRead ? 'YES' : 'NO',
-        'details' => $error
-    ];
-}
+$stmt = $pdo->prepare("
+    SELECT 
+        SUBSTRING_INDEX(virtual_path, '/', 1) as root_folder, 
+        COUNT(*) as total_files 
+    FROM file_index 
+    GROUP BY root_folder
+");
+$stmt->execute();
+$counts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 echo "<pre>";
-echo "<h3>Directory Read Permission Test:</h3>\n";
-print_r($results);
+echo "<h3>Total Indexed Files IN THE DATABASE per Root Folder:</h3>\n";
+print_r($counts);
 echo "</pre>";
 ?>
 
