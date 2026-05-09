@@ -83,7 +83,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
                 SELECT file_name AS name, virtual_path AS path, is_dir AS isDir, file_size AS size
                 FROM file_index
                 WHERE (file_name LIKE ? OR virtual_path LIKE ?)
-                  AND (is_dir = 1 OR file_name LIKE '%.pdf')
                 ORDER BY is_dir DESC, file_name ASC
                 LIMIT 100
             ");
