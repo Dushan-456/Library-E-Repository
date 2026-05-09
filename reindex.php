@@ -81,7 +81,8 @@ if ($action === 'list') {
 
 // Run the re-index process
 if ($action === 'run') {
-    set_time_limit(600); // Allow up to 10 minutes
+    set_time_limit(0); // No time limit (0) because 147,000+ files take a long time
+    ini_set('memory_limit', '2048M'); // Increase memory limit to 2GB
     $startTime = microtime(true);
     $count = 0;
 
