@@ -57,6 +57,27 @@ $activePage = 'reindex';
         .status-toast.success { display: flex; background: rgba(34,197,94,0.1); color: #16a34a; border: 1px solid rgba(34,197,94,0.3); }
         .status-toast.error { display: flex; background: rgba(239,68,68,0.1); color: #dc2626; border: 1px solid rgba(239,68,68,0.3); }
 
+        /* Modal Styles */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: var(--bg-card); padding: 2.5rem; border-radius: 12px; width: 90%; max-width: 450px;
+            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            color: var(--text-main);
+        }
+        .modal-icon { font-size: 4rem; margin-bottom: 1.5rem; }
+        .modal-icon.success { color: #10b981; }
+        .modal-icon.error { color: #ef4444; }
+        .modal-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.75rem; color: var(--text-main); }
+        .modal-text { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2rem; line-height: 1.5; }
+        .modal-btn {
+            padding: 0.8rem 2.5rem; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;
+            background: var(--primary); color: white; transition: background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .modal-btn:hover { background: #2563eb; transform: translateY(-1px); }
+
         .filter-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: center; }
         .filter-bar input {
             flex: 1; max-width: 400px; padding: 0.6rem 1rem; border: 1px solid var(--border);
@@ -177,6 +198,16 @@ $activePage = 'reindex';
         </main>
     </div>
 
+    <!-- Result Modal -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-content">
+            <div id="modalIcon" class="modal-icon success"><i class="fas fa-check-circle"></i></div>
+            <div class="modal-title" id="modalTitle">Indexing Complete</div>
+            <div class="modal-text" id="modalMessage">Successfully indexed files.</div>
+            <button class="modal-btn" onclick="closeModal()">OK, Got it</button>
+        </div>
+    </div>
+
     <script>
         let currentPage = 1;
         let currentFilter = '';
@@ -240,32 +271,50 @@ $activePage = 'reindex';
             el.innerHTML = html;
         }
 
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+        }
+
         async function runReindex() {
             const btn = document.getElementById('btnReindex');
             const icon = document.getElementById('reindexIcon');
-            const toast = document.getElementById('statusToast');
 
             btn.disabled = true;
             icon.className = 'fas fa-sync-alt fa-spin';
-            btn.querySelector('span') || (btn.innerHTML = '<i class="fas fa-sync-alt fa-spin" id="reindexIcon"></i> Indexing...');
-            toast.className = 'status-toast';
-            toast.style.display = 'none';
+            btn.innerHTML = '<i class="fas fa-sync-alt fa-spin" id="reindexIcon"></i> Indexing... (Please wait)';
+            
+            // Hide old toast if it was there
+            document.getElementById('statusToast').style.display = 'none';
 
             try {
                 const resp = await fetch('reindex.php?action=run');
                 const data = await resp.json();
+                
+                const modal = document.getElementById('resultModal');
+                const modalIcon = document.getElementById('modalIcon');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalMessage = document.getElementById('modalMessage');
 
                 if (data.success) {
-                    toast.className = 'status-toast success';
-                    toast.innerHTML = `<i class="fas fa-check-circle"></i> ${data.message}`;
+                    modalIcon.className = 'modal-icon success';
+                    modalIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    modalTitle.textContent = 'Indexing Complete!';
+                    modalMessage.textContent = data.message;
                     loadIndex(1, currentFilter);
                 } else {
-                    toast.className = 'status-toast error';
-                    toast.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${data.error || 'Unknown error'}`;
+                    modalIcon.className = 'modal-icon error';
+                    modalIcon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+                    modalTitle.textContent = 'Indexing Error';
+                    modalMessage.textContent = data.error || 'Unknown error occurred.';
                 }
+                modal.style.display = 'flex';
             } catch (e) {
-                toast.className = 'status-toast error';
-                toast.innerHTML = '<i class="fas fa-exclamation-circle"></i> Network error during indexing';
+                const modal = document.getElementById('resultModal');
+                document.getElementById('modalIcon').className = 'modal-icon error';
+                document.getElementById('modalIcon').innerHTML = '<i class="fas fa-wifi"></i>';
+                document.getElementById('modalTitle').textContent = 'Network Error';
+                document.getElementById('modalMessage').textContent = 'A network error or timeout occurred during indexing.';
+                modal.style.display = 'flex';
             }
 
             btn.disabled = false;
