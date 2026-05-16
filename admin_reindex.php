@@ -11,6 +11,14 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || !isset($_
 require_once __DIR__ . '/session_timeout.php';
 
 $activePage = 'reindex';
+
+$pending_count = 0;
+try {
+    $countStmt = $pdo->query("SELECT COUNT(*) FROM users WHERE status = 'inactive'");
+    $pending_count = $countStmt->fetchColumn();
+} catch (PDOException $e) {
+    // Ignore
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -143,6 +151,12 @@ $activePage = 'reindex';
                     <li onclick="window.location.href='index.php'"><i class="fas fa-home"></i> <span>Home</span></li>
                     <li style="margin-top: 1rem; padding-left: 1.5rem; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; cursor: default; pointer-events: none; border: none;">Admin Panel</li>
                     <li class="<?= $activePage == 'create_user' ? 'active' : '' ?>" onclick="window.location.href='admin_create_user.php'"><i class="fas fa-user-plus"></i> <span>Add New User</span></li>
+                    <li class="<?= $activePage == 'pending_users' ? 'active' : '' ?>" onclick="window.location.href='admin_pending_users.php'">
+                        <i class="fas fa-user-clock"></i> <span>Pending Activations</span>
+                        <?php if ($pending_count > 0): ?>
+                            <span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: auto;"><?= $pending_count ?></span>
+                        <?php endif; ?>
+                    </li>
                     <li class="<?= $activePage == 'all_users' ? 'active' : '' ?>" onclick="window.location.href='admin_users.php'"><i class="fas fa-users"></i> <span>All Users</span></li>
                     <li class="<?= $activePage == 'activity' ? 'active' : '' ?>" onclick="window.location.href='admin_activity.php'"><i class="fas fa-history"></i> <span>Library Analytics</span></li>
                     <li class="<?= $activePage == 'reindex' ? 'active' : '' ?>" onclick="window.location.href='admin_reindex.php'"><i class="fas fa-database"></i> <span>Search Index</span></li>
