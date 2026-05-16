@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, speciality, id_number, slmc_number, role, status, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$first_name, $last_name, $email, $speciality, $id_number, $slmc_number, $role, $status, $password_hash]);
-                $message = "Registration successful! Your account is pending activation by an administrator.";
+                $message = "Registration successful! Your account is pending activation by an administrator.Contact Library Staff to complete your account activation process.";
             } catch (PDOException $e) {
                 if ($e->getCode() == 23000) {
                     $error = "Error: Email or ID Number already exists.";
@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             gap: 20px;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            height: calc(100vh / var(--app-zoom, 1));
             padding: 2rem 0;
         }
         .logo {
