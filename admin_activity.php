@@ -263,14 +263,14 @@ try {
                     <li style="margin-top: 1rem; padding-left: 1.5rem; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; cursor: default; pointer-events: none; border: none;">
                         Admin Panel
                     </li>
-                    <li class="<?= $activePage == 'create_user' ? 'active' : '' ?>" onclick="window.location.href='admin_create_user.php'">
-                        <i class="fas fa-user-plus"></i> <span>Add New User</span>
-                    </li>
                     <li class="<?= $activePage == 'pending_users' ? 'active' : '' ?>" onclick="window.location.href='admin_pending_users.php'">
                         <i class="fas fa-user-clock"></i> <span>Pending Activations</span>
                         <?php if ($pending_count > 0): ?>
                             <span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: auto;"><?= $pending_count ?></span>
                         <?php endif; ?>
+                    </li>
+                    <li class="<?= $activePage == 'create_user' ? 'active' : '' ?>" onclick="window.location.href='admin_create_user.php'">
+                        <i class="fas fa-user-plus"></i> <span>Add New User</span>
                     </li>
                     <li class="<?= $activePage == 'all_users' ? 'active' : '' ?>" onclick="window.location.href='admin_users.php'">
                         <i class="fas fa-users"></i> <span>All Users</span>
