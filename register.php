@@ -1,9 +1,49 @@
 <?php
 session_start();
+require_once __DIR__ . '/db_config.php';
+
 // If already logged in, redirect to index
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
     header("Location: index.php");
     exit;
+}
+
+$message = "";
+$error = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $first_name = trim($_POST['first_name'] ?? '');
+    $last_name = trim($_POST['last_name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $id_number = trim($_POST['id_number'] ?? '');
+    $speciality = trim($_POST['speciality'] ?? '');
+    $slmc_number = trim($_POST['slmc_number'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+
+    if ($first_name && $last_name && $email && $id_number && $password) {
+        if ($password !== $confirm_password) {
+            $error = "Passwords do not match.";
+        } else {
+            try {
+                $password_hash = password_hash($password, PASSWORD_DEFAULT);
+                $role = 'User';
+                $status = 'inactive';
+
+                $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, speciality, id_number, slmc_number, role, status, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$first_name, $last_name, $email, $speciality, $id_number, $slmc_number, $role, $status, $password_hash]);
+                $message = "Registration successful! Your account is pending activation by an administrator.";
+            } catch (PDOException $e) {
+                if ($e->getCode() == 23000) {
+                    $error = "Error: Email or ID Number already exists.";
+                } else {
+                    $error = "Database Error: " . $e->getMessage();
+                }
+            }
+        }
+    } else {
+        $error = "Please fill in all required fields.";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -22,7 +62,7 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
             border-radius: 16px;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 450px;
+            max-width: 550px;
             text-align: center;
         }
         .login-header {
@@ -46,7 +86,7 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
             cursor: pointer;
             transition: background 0.2s;
             text-decoration: none;
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             box-sizing: border-box;
         }
         .login-btn:hover {
@@ -62,12 +102,65 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
             gap: 20px;
             align-items: center;
             justify-content: center;
-            height: calc(100vh / var(--app-zoom, 1));
+            min-height: 100vh;
+            padding: 2rem 0;
         }
         .logo {
             width: 130px;
             height: 130px;
         }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            text-align: left;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #475569;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            background: #f8fafc;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        .message-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .message-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+        }
+
+        /* Commented out original QR styles */
+        /*
         .qr-container {
             display: flex;
             justify-content: center;
@@ -93,10 +186,7 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
             border-radius: 8px;
             border: 1px dashed var(--border);
         }
-        .instructions strong {
-            color: var(--primary);
-            margin-right: 0.5rem;
-        }
+        */
     </style>
 </head>
 <body>
@@ -107,7 +197,55 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
                 <h2>Register Account</h2>
                 <p style="color: #64748b; font-size: 0.875rem;">Join the PGIM Digital Library</p>
             </div>
+
+            <?php if ($message): ?>
+                <div class="message message-success"><?= htmlspecialchars($message) ?></div>
+            <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="message message-error"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
+
+            <?php if (!$message): ?>
+            <form method="POST" action="register.php">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>First Name *</label>
+                        <input type="text" name="first_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name *</label>
+                        <input type="text" name="last_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ID Number *</label>
+                        <input type="text" name="id_number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Speciality</label>
+                        <input type="text" name="speciality">
+                    </div>
+                    <div class="form-group">
+                        <label>SLMC Number</label>
+                        <input type="text" name="slmc_number">
+                    </div>
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password *</label>
+                        <input type="password" name="confirm_password" required>
+                    </div>
+                </div>
+                <button type="submit" class="login-btn"><i class="fas fa-user-plus"></i> Register</button>
+            </form>
+            <?php endif; ?>
             
+            <!-- Original QR Code Registration (Commented Out)
             <div class="qr-container">
                 <img class="qr-image" src="./assets/img/new-qr.png" alt="Registration QR Code">
             </div>
@@ -117,9 +255,11 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
                 <div><strong>2.</strong> Fill out the online registration form.</div>
                 <div><strong>3.</strong> Contact Library Staff to complete your account activation process.</div>
             </div>
+            -->
 
-            <a href="login.php" class="login-btn"><i class="fas fa-arrow-left"></i> Back to Login</a>
+            <a href="login.php" class="login-btn" style="background: transparent; color: var(--primary); border: 1px solid var(--primary);"><i class="fas fa-arrow-left"></i> Back to Login</a>
         </div>
     </div>
 </body>
 </html>
+
