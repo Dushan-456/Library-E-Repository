@@ -55,6 +55,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $error = "Incorrect current password.";
     }
 }
+
+$pending_count = 0;
+if ($_SESSION['role'] === 'Admin') {
+    try {
+        $countStmt = $pdo->query("SELECT COUNT(*) FROM users WHERE status = 'inactive'");
+        $pending_count = $countStmt->fetchColumn();
+    } catch (PDOException $e) {
+        // Ignore
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -250,6 +260,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </li>
                     <li onclick="window.location.href='admin_create_user.php'">
                         <i class="fas fa-user-plus"></i> <span>Add New User</span>
+                    </li>
+                    <li onclick="window.location.href='admin_pending_users.php'">
+                        <i class="fas fa-user-clock"></i> <span>Pending Activations</span>
+                        <?php if ($pending_count > 0): ?>
+                            <span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: auto;"><?= $pending_count ?></span>
+                        <?php endif; ?>
                     </li>
                     <li onclick="window.location.href='admin_users.php'">
                         <i class="fas fa-users"></i> <span>All Users</span>
