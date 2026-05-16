@@ -87,7 +87,9 @@ if ($action === 'run') {
     $count = 0;
 
     try {
-        $pdo->exec("TRUNCATE TABLE file_index");
+        // Fetch existing paths to avoid duplicates (incremental indexing)
+        $existingPaths = $pdo->query("SELECT virtual_path FROM file_index")->fetchAll(PDO::FETCH_COLUMN);
+        $knownPaths = array_flip($existingPaths);
 
         $insertStmt = $pdo->prepare("INSERT INTO file_index (file_name, virtual_path, is_dir, file_size) VALUES (?, ?, ?, ?)");
         $batch = [];
@@ -113,6 +115,10 @@ if ($action === 'run') {
                         $relPath = str_replace(DIRECTORY_SEPARATOR, '/', $relPath);
 
                         $virtualPath = ($rootName === 'DEFAULT') ? $relPath : $rootName . '/' . $relPath;
+                        
+                        // Skip if file already exists in index
+                        if (isset($knownPaths[$virtualPath])) continue;
+
                         $isDir = $file->isDir() ? 1 : 0;
                         $fileSize = $file->isFile() ? $file->getSize() : 0;
 
@@ -146,7 +152,7 @@ if ($action === 'run') {
             'success' => true,
             'count' => $count,
             'elapsed' => $elapsed,
-            'message' => "Indexed {$count} files/folders in {$elapsed}s"
+            'message' => "Found {$count} new files/folders. Total elapsed time: {$elapsed}s"
         ]);
     } catch (PDOException $e) {
         echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
