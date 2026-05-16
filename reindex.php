@@ -95,9 +95,12 @@ if ($action === 'run') {
         $batch = [];
         $batchSize = 500;
 
+        $scannedMappings = [];
         foreach ($LIBRARY_MAPPINGS as $rootName => $physicalBase) {
             $realBase = realpath($physicalBase);
             if (!$realBase || !is_dir($realBase)) continue;
+            
+            $scannedMappings[] = $rootName;
 
             try {
                 $dirIt = new RecursiveDirectoryIterator($realBase, RecursiveDirectoryIterator::SKIP_DOTS);
@@ -116,8 +119,11 @@ if ($action === 'run') {
 
                         $virtualPath = ($rootName === 'DEFAULT') ? $relPath : $rootName . '/' . $relPath;
                         
-                        // Skip if file already exists in index
-                        if (isset($knownPaths[$virtualPath])) continue;
+                        // Mark as found by unsetting from knownPaths
+                        if (isset($knownPaths[$virtualPath])) {
+                            unset($knownPaths[$virtualPath]);
+                            continue;
+                        }
 
                         $isDir = $file->isDir() ? 1 : 0;
                         $fileSize = $file->isFile() ? $file->getSize() : 0;
@@ -146,13 +152,33 @@ if ($action === 'run') {
             $insertStmt->execute($row);
         }
 
+        // Cleanup orphaned records (files that no longer exist)
+        $deletedCount = 0;
+        if (!empty($knownPaths)) {
+            // Any path still in $knownPaths was not found on the drive.
+            // However, we only delete if the root mapping it belongs to was successfully scanned.
+            $deleteStmt = $pdo->prepare("DELETE FROM file_index WHERE virtual_path = ?");
+            
+            foreach ($knownPaths as $path => $val) {
+                $parts = explode('/', $path, 2);
+                $rootPart = $parts[0];
+                $mapping = isset($LIBRARY_MAPPINGS[$rootPart]) ? $rootPart : 'DEFAULT';
+
+                if (in_array($mapping, $scannedMappings)) {
+                    $deleteStmt->execute([$path]);
+                    $deletedCount++;
+                }
+            }
+        }
+
         $elapsed = round(microtime(true) - $startTime, 2);
 
         echo json_encode([
             'success' => true,
             'count' => $count,
+            'deleted' => $deletedCount,
             'elapsed' => $elapsed,
-            'message' => "Found {$count} new files/folders. Total elapsed time: {$elapsed}s"
+            'message' => "Sync complete: {$count} new added, {$deletedCount} removed. Total time: {$elapsed}s"
         ]);
     } catch (PDOException $e) {
         echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
