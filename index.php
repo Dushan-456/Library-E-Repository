@@ -107,6 +107,16 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
     echo json_encode($results);
     exit;
 }
+$pending_count = 0;
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin') {
+    require_once __DIR__ . '/db_config.php';
+    try {
+        $countStmt = $pdo->query("SELECT COUNT(*) FROM users WHERE status = 'inactive'");
+        $pending_count = $countStmt->fetchColumn();
+    } catch (PDOException $e) {
+        // Ignore
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -194,6 +204,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                         <li style="margin-top: 1rem; padding-left: 1.5rem; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; cursor: default; pointer-events: none; border: none;">
                             Admin Panel
+                        </li>
+                        <li onclick="window.location.href='admin_pending_users.php'">
+                            <i class="fas fa-user-clock"></i> <span>Pending Activations</span>
+                            <?php if ($pending_count > 0): ?>
+                                <span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: auto;"><?= $pending_count ?></span>
+                            <?php endif; ?>
                         </li>
                         <li onclick="window.location.href='admin_create_user.php'">
                             <i class="fas fa-user-plus"></i> <span>Add New User</span>
