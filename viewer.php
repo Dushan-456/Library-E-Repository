@@ -431,6 +431,7 @@ try {
         
         let pdfDoc = null;
         let scale = 1.3;
+        let scaleInitialized = false;
         let pagesToRender = new Set();
         let renderedPages = new Set();
         // Initialize PDF.js worker locally for offline support
@@ -441,6 +442,20 @@ try {
                 pdfDoc = await pdfjsLib.getDocument(url).promise;
                 document.getElementById('total-pages').textContent = pdfDoc.numPages;
                 
+                // Dynamically adjust initial scale based on viewport width (only on initial load)
+                if (!scaleInitialized) {
+                    const padding = 40;
+                    const availableWidth = pdfViewport.clientWidth - padding;
+                    if (availableWidth > 0 && pdfDoc.numPages > 0) {
+                        const firstPage = await pdfDoc.getPage(1);
+                        const unscaledViewport = firstPage.getViewport({ scale: 1.0 });
+                        const idealScale = availableWidth / unscaledViewport.width;
+                        // Cap scale between 0.2 and 1.3 for optimal reading
+                        scale = Math.max(Math.min(idealScale, 1.3), 0.2);
+                    }
+                    scaleInitialized = true;
+                }
+
                 // Create placeholders for all pages
                 for (let i = 1; i <= pdfDoc.numPages; i++) {
                     const pageContainer = document.createElement('div');
@@ -570,7 +585,7 @@ try {
 
         // Toolbar Events
         document.getElementById('zoom-in').onclick = () => { scale += 0.2; refreshAllPages(); };
-        document.getElementById('zoom-out').onclick = () => { if (scale > 0.5) scale -= 0.2; refreshAllPages(); };
+        document.getElementById('zoom-out').onclick = () => { if (scale > 0.2) scale -= 0.2; refreshAllPages(); };
         document.getElementById('toggle-sidebar').onclick = () => {
             const sidebar = document.getElementById('sidebar');
             sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'none';
