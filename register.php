@@ -287,9 +287,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <label>Email *</label>
                             <input type="email" name="email" id="email" required
                                    pattern="^[a-zA-Z0-9._%+-]+@pgim\.cmb\.ac\.lk$"
-                                   title="Please use a @pgim.cmb.ac.lk email address">
+                                   title="Please use a PGIM Email address">
                             <span id="email-error" style="color: #ef4444; font-size: 0.75rem; display: none; margin-top: 0.25rem;">
-                                Email must be a @pgim.cmb.ac.lk address.
+                                Email must be PGIM Email address.
                             </span>
                         </div>
                         <div class="form-group">
@@ -325,7 +325,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 
                 <div class="instructions">
-                    <div><strong>1.</strong> Scan the QR code above or <a href="https://forms.gle/your-google-form-link" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: underline;">click here</a> to fill out the form.</div>
+                    <div><strong>1.</strong> Scan the QR code above  to fill out the form.</div>
                     <div><strong>2.</strong> Fill out the online registration form.</div>
                     <div><strong>3.</strong> Contact Library Staff to complete your account activation process.</div>
                 </div>
