@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     speciality VARCHAR(255),
     id_number VARCHAR(100) NOT NULL UNIQUE,
     slmc_number VARCHAR(100),
-    role ENUM('Admin', 'User') DEFAULT 'User',
+    role ENUM('Admin', 'Manager', 'User') DEFAULT 'User',
     status ENUM('active', 'inactive') DEFAULT 'active',
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -71,3 +71,7 @@ VALUES (
     '$2y$10$cq6t80T5Ta1Ny2jKCPgQae9A6dY7IulurSWawVdRjVh0ZxrA6egcq'
 )
 ON DUPLICATE KEY UPDATE id_number=id_number;
+
+
+
+-- ALTER TABLE users MODIFY COLUMN role ENUM('Admin', 'Manager', 'User') DEFAULT 'User';
