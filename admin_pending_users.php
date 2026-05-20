@@ -4,7 +4,7 @@ require_once __DIR__ . '/seb_check.php';
 require_once __DIR__ . '/db_config.php';
 
 // Authentication Check
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || !isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || !isset($_SESSION['role']) || ($_SESSION['role'] !== 'Admin' && $_SESSION['role'] !== 'Manager')) {
     header("Location: index.php");
     exit;
 }
@@ -129,18 +129,20 @@ $pending_count = count($pending_users);
                             <span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: auto;"><?= $pending_count ?></span>
                         <?php endif; ?>
                     </li>
-                    <li class="<?= $activePage == 'create_user' ? 'active' : '' ?>" onclick="window.location.href='admin_create_user.php'">
-                        <i class="fas fa-user-plus"></i> <span>Add New User</span>
-                    </li>
-                    <li class="<?= $activePage == 'all_users' ? 'active' : '' ?>" onclick="window.location.href='admin_users.php'">
-                        <i class="fas fa-users"></i> <span>All Users</span>
-                    </li>
-                    <li class="<?= $activePage == 'activity' ? 'active' : '' ?>" onclick="window.location.href='admin_activity.php'">
-                        <i class="fas fa-history"></i> <span>Library Analytics</span>
-                    </li>
-                    <li class="<?= $activePage == 'reindex' ? 'active' : '' ?>" onclick="window.location.href='admin_reindex.php'">
-                        <i class="fas fa-database"></i> <span>Search Index</span>
-                    </li>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                        <li class="<?= $activePage == 'create_user' ? 'active' : '' ?>" onclick="window.location.href='admin_create_user.php'">
+                            <i class="fas fa-user-plus"></i> <span>Add New User</span>
+                        </li>
+                        <li class="<?= $activePage == 'all_users' ? 'active' : '' ?>" onclick="window.location.href='admin_users.php'">
+                            <i class="fas fa-users"></i> <span>All Users</span>
+                        </li>
+                        <li class="<?= $activePage == 'activity' ? 'active' : '' ?>" onclick="window.location.href='admin_activity.php'">
+                            <i class="fas fa-history"></i> <span>Library Analytics</span>
+                        </li>
+                        <li class="<?= $activePage == 'reindex' ? 'active' : '' ?>" onclick="window.location.href='admin_reindex.php'">
+                            <i class="fas fa-database"></i> <span>Search Index</span>
+                        </li>
+                    <?php endif; ?>
                     <li onclick="window.location.href='profile.php'">
                         <i class="fas fa-id-card"></i> <span>My Profile</span>
                     </li>
