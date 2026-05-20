@@ -255,6 +255,7 @@ try {
                                 <label>System Role</label>
                                 <select name="role">
                                     <option value="User" <?= (isset($user['role']) && $user['role'] == 'User') ? 'selected' : '' ?>>User</option>
+                                    <option value="Manager" <?= (isset($user['role']) && $user['role'] == 'Manager') ? 'selected' : '' ?>>Manager</option>
                                     <option value="Admin" <?= (isset($user['role']) && $user['role'] == 'Admin') ? 'selected' : '' ?>>Admin</option>
                                 </select>
                             </div>
