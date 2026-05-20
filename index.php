@@ -108,7 +108,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'search') {
     exit;
 }
 $pending_count = 0;
-if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin') {
+if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Manager')) {
     require_once __DIR__ . '/db_config.php';
     try {
         $countStmt = $pdo->query("SELECT COUNT(*) FROM users WHERE status = 'inactive'");
@@ -201,7 +201,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin') {
                     <li onclick="window.location.href='profile.php'">
                         <i class="fas fa-id-card"></i> <span>My Profile</span>
                     </li>
-                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Manager')): ?>
                         <li style="margin-top: 1rem; padding-left: 1.5rem; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; cursor: default; pointer-events: none; border: none;">
                             Admin Panel
                         </li>
@@ -211,18 +211,20 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin') {
                                 <span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: auto;"><?= $pending_count ?></span>
                             <?php endif; ?>
                         </li>
-                        <li onclick="window.location.href='admin_create_user.php'">
-                            <i class="fas fa-user-plus"></i> <span>Add New User</span>
-                        </li>
-                        <li onclick="window.location.href='admin_users.php'">
-                            <i class="fas fa-users"></i> <span>All Users</span>
-                        </li>
-                        <li onclick="window.location.href='admin_activity.php'">
-                            <i class="fas fa-history"></i> <span>Library Analytics</span>
-                        </li>
-                        <li onclick="window.location.href='admin_reindex.php'">
-                            <i class="fas fa-database"></i> <span>Search Index</span>
-                        </li>
+                        <?php if ($_SESSION['role'] === 'Admin'): ?>
+                            <li onclick="window.location.href='admin_create_user.php'">
+                                <i class="fas fa-user-plus"></i> <span>Add New User</span>
+                            </li>
+                            <li onclick="window.location.href='admin_users.php'">
+                                <i class="fas fa-users"></i> <span>All Users</span>
+                            </li>
+                            <li onclick="window.location.href='admin_activity.php'">
+                                <i class="fas fa-history"></i> <span>Library Analytics</span>
+                            </li>
+                            <li onclick="window.location.href='admin_reindex.php'">
+                                <i class="fas fa-database"></i> <span>Search Index</span>
+                            </li>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </ul>
             </nav>
